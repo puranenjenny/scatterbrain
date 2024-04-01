@@ -16,7 +16,7 @@ class InfoSivu extends StatelessWidget {
         decoration: BoxDecoration( 
         image: DecorationImage(
           image: AssetImage("images/tausta_info.png"), // taustakuva
-          fit: BoxFit.cover, // täyttää koko ruudun
+          fit: BoxFit.fill, // fill näyttää koko kuvan
         ),
       ),
         child: Stack(

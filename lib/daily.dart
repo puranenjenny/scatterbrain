@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Tuodaan intl-paketti käyttöön päivämäärän käsittelyä varten
+import 'package:intl/intl.dart'; 
 
 class DailySivu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Muotoillaan nykyinen päivämäärä halutussa muodossa
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
 
     return Scaffold(
@@ -13,9 +12,9 @@ class DailySivu extends StatelessWidget {
           backgroundColor: Color(0xFF1F1F1F),
           toolbarHeight: 97,
           title: Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 0), // Muutettu bottom-padding 0:aan
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 0), 
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,// Lisätään Column-widget päivämäärän näyttämiseksi otsikon alla
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Daily Tasks',
                     style: TextStyle(
@@ -32,11 +31,11 @@ class DailySivu extends StatelessWidget {
           )),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/tausta_ilta.png"), // taustakuva
-            fit: BoxFit.cover, // täyttää koko ruudun
-          ),
-        ),
+    image: DecorationImage(
+      image: AssetImage("images/tausta_ilta.png"),
+      fit: BoxFit.contain, // contain 
+    ),
+  ),
         child: Stack(
           children: [
             // Lisää widgettejä tarvittaessa

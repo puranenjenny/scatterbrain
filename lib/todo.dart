@@ -71,7 +71,7 @@ class _ToDoSivuState extends State<ToDoSivu> { // todo sivu luokka
         decoration: BoxDecoration( 
         image: DecorationImage(
           image: AssetImage("images/tausta_todo.png"), // taustakuva
-          fit: BoxFit.cover, // täyttää koko ruudun
+          fit: BoxFit.cover, // cover
         ),
       ),
         child: Stack(
