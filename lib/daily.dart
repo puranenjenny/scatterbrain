@@ -1,41 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Tuodaan intl-paketti käyttöön päivämäärän käsittelyä varten
 
 class DailySivu extends StatelessWidget {
-   @override
+  @override
   Widget build(BuildContext context) {
+    // Muotoillaan nykyinen päivämäärä halutussa muodossa
+    String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
+
     return Scaffold(
       backgroundColor: Color(0xFF1F1F1F),
       appBar: AppBar(
-        backgroundColor: Color(0xFF1F1F1F),
-        toolbarHeight: 90,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
-          child: Text('Daily Tasks', style: TextStyle(color: Color(0xFFA3DAFF), fontSize: 50, fontFamily: 'GochiHand')),
-        )),
-      body: Container(
-        decoration: BoxDecoration( 
-        image: DecorationImage(
-          image: AssetImage("images/tausta_ilta.png"), // taustakuva
-          fit: BoxFit.cover, // täyttää koko ruudun
-        ),
-      ),
-        child: Stack(
-        children: [
-          
-         /*  Positioned( //napin sijainti
-            top: 0, // ylhäältä 0 pikseliä
-            right: 40, // oikealta 30 pikseliä
-/*             child: FloatingActionButton( 
-              onPressed: Null,
-              child: Image.asset('images/btn_add.png'),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ), */
-          ), */
-        ],
+          backgroundColor: Color(0xFF1F1F1F),
+          toolbarHeight: 97,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 0), // Muutettu bottom-padding 0:aan
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,// Lisätään Column-widget päivämäärän näyttämiseksi otsikon alla
+              children: [
+                Text('Daily Tasks',
+                    style: TextStyle(
+                        color: Color(0xFFA3DAFF),
+                        fontSize: 50,
+                        fontFamily: 'GochiHand')),
+                Text(formattedDate, // päivämäärä
+                    style: TextStyle(
+                        color: Color(0xFFA3DAFF),
+                        fontSize: 20, 
+                        fontFamily: 'GochiHand'))
+              ],
             ),
+          )),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/tausta_ilta.png"), // taustakuva
+            fit: BoxFit.cover, // täyttää koko ruudun
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Lisää widgettejä tarvittaessa
+          ],
+        ),
       ),
     );
   }
 }
-
