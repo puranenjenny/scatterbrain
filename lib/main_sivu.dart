@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget { // myapp sovellus
       debugShowCheckedModeBanner: false, // poistetaan debug banneri
       title: 'Scatterbrain', // sovelluksen nimi
       theme: ThemeData( // teema
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 26, 193, 199)), // väri
+        colorScheme: ColorScheme.fromSeed(seedColor: Turkoosi), // väri
         useMaterial3: true, // käytetään materiaaliteemaa
       ),
       home: const MyHomePage(title: 'Scatterbrain HomeSivu'), // kotisivu
@@ -52,11 +52,11 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
 
     return Scaffold( // palautetaan sivuston runko
       appBar: AppBar( // yläpalkki
-        toolbarHeight: 110, // korkeus kovakoodattu jotta logo on sopiva
+        toolbarHeight: 115, // korkeus kovakoodattu jotta logo on sopiva
         backgroundColor:TummaTausta, // yläpalkin taustaväri
         title: Center(child: Image.asset('images/logo.png')), // logo keskellä
       ),
-      body: Center(
+      body: Center( // keskitys
         child: Sivut.elementAt(valittuIndexi), // näyttää kyseisen sivun
       ),
       bottomNavigationBar: BottomNavigationBar(

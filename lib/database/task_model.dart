@@ -1,5 +1,5 @@
 class Task {
-  final int? id; // # tarkoittaa että id voi olla null
+  final int? id; // tehtävän id
   final String title; // tehtävän nimi
   final bool done; // onko tehtävä tehty
 
@@ -9,7 +9,7 @@ class Task {
     return Task( // palauta tehtävä
       id: json['id'], // id
       title: json['title'], // nimi
-      done: json['done'], // onko tehty
+      done: json['done'] == 1, // onko tehty
     );
   }
 
@@ -17,7 +17,7 @@ class Task {
     return {
       'id': id,
       'title': title,
-      'done': done,
+      'done': done ? 1 : 0, 
     };
   }
 }

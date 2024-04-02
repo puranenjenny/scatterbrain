@@ -1,43 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:scatter_brain/constants/colors.dart';
+import 'package:scatter_brain/database/database_helper.dart';
+import 'package:scatter_brain/database/task_model.dart'; // Säädä import-polku projektisi rakenteen mukaan
+import 'package:scatter_brain/constants/colors.dart'; // Varmista, että tämä polku on oikein
 
 class ToDoSivu extends StatefulWidget {
+  const ToDoSivu({Key? key}) : super(key: key);
+
   @override
   _ToDoSivuState createState() => _ToDoSivuState();
 }
 
-class _ToDoSivuState extends State<ToDoSivu> { // todo sivu luokka
-  final List<String> _todos = []; // todo lista
+class _ToDoSivuState extends State<ToDoSivu> {
+  List<Task> _todos = [];
+  final TextEditingController _textFieldController = TextEditingController();
 
-  void _addTodoItem(String task) { //lisätään tehtävä metodi johon syötetään tehtävä
-    if (task.isNotEmpty) { // jos tehtävä ei ole tyhjä
-      setState(() { // asetetaan uusi state
-        _todos.add(task); // lisätään tehtävä
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    _loadTodos();
   }
 
-  void _showAddTodoDialog() { // lisää tehtävä ikkuna metodi joka avaa ikkunan ja kysyy tehtävää
+void _loadTodos() async {
+  final tasks = await DatabaseHelper.getTasks();
+  if (tasks != null) {
+    // Järjestä tehtävät niin, että tekemättömät (done == false) tulevat ensin
+    tasks.sort((a, b) {
+      if (a.done == b.done) {
+        return 0; // Älä muuta järjestystä, jos molemmat ovat samassa tilassa
+      } else if (a.done && !b.done) {
+        return 1; // Siirrä tehtyjä tehtäviä listan loppuun
+      } else {
+        return -1; // Pidä tekemättömät tehtävät listan alussa
+      }
+    });
+
+    setState(() {
+      _todos = tasks;
+    });
+  }
+}
+
+  void _showAddTodoDialog() { // lisää tehtävä dialogi
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _textFieldController = TextEditingController(); // tekstikentän controller
-
-        return AlertDialog( // palautetaan alertdialog
+        return AlertDialog(
           title: Text('Add a task', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
           backgroundColor: Tausta,
           content: TextField(
             style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
             controller: _textFieldController,
-            decoration: InputDecoration(hintText: "Write a task here..." ,hintStyle: TextStyle(color: Sininen, 
-            fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), 
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
+            decoration: InputDecoration(hintText: "Write a task here...", hintStyle: TextStyle(color: Sininen, fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
           ),
           actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys
+              children: [
+/*                 IconButton(
+                icon: Icon(Icons.add, color: Sininen), // Voit vaihtaa ikonin tarpeesi mukaan
+                onPressed: () {
+                  _showAddtoDailyDialog();
+                },), */
+                TextButton(
+                  child: Text('Save', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
+                  onPressed: () {
+                    if (_textFieldController.text.isNotEmpty) {
+                      final newTask = Task(title: _textFieldController.text, done: false);
+                      DatabaseHelper.addTask(newTask);
+                      _textFieldController.clear();
+                      _loadTodos();
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteTodoDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete selected', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
+          backgroundColor: Tausta,
+          actions: <Widget>[
             TextButton(
-              child: Text('Add', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
+              child: Text('Click here to delete', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
               onPressed: () {
-                _addTodoItem(_textFieldController.text);
+                DatabaseHelper.deleteSelectedTasks();
+                _loadTodos();
                 Navigator.of(context).pop();
               },
             ),
@@ -50,46 +106,54 @@ class _ToDoSivuState extends State<ToDoSivu> { // todo sivu luokka
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1F1F1F),
+      backgroundColor: Tausta,
       appBar: AppBar(
-        backgroundColor: Color(0xFF1F1F1F),
+        backgroundColor: Tausta,
         toolbarHeight: 90,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
-          child: Text('Todo List', style: TextStyle(color: Color(0xFFA3DAFF), fontSize: 50, fontFamily: 'GochiHand')),
-        ),
-        actions: <Widget>[ // Lisätään actions tähän
-        Padding(
-          padding: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-          child: IconButton(
-            icon: Image.asset('images/btn_add.png'), // Käytä omaa nappikuvaketta
-                onPressed: _showAddTodoDialog,
+        title: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
+        actions: <Widget>[
+          IconButton(
+            icon: Image.asset('images/btn_add.png', width: 44, height: 44), //lisää nappi
+            onPressed: _showAddTodoDialog,
           ),
-        ),
-      ],
-      ),
-      body: Container(
-        decoration: BoxDecoration( 
-        image: DecorationImage(
-          image: AssetImage("images/tausta_todo.png"), // taustakuva
-          fit: BoxFit.cover, // cover
-        ),
-      ),
-        child: Stack(
-        children: [
-          ListView.builder(
-            itemCount: _todos.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 30, right: 20),
-                child: ListTile(
-                  title: Text(_todos[index], style: TextStyle(color: Color(0xFFA3DAFF), fontFamily: 'FiraCode', fontSize: 20),),
-                ),
-              );
-            },
+          IconButton(
+            icon: Image.asset('images/trash2.png', width: 44, height: 44), // poista nappi
+            onPressed: _showDeleteTodoDialog,
           ),
         ],
-            ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/tausta_todo.png"), // Taustakuva
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: ListView.builder(
+          itemCount: _todos.length,
+          itemBuilder: (context, index) {
+            final task = _todos[index];
+            return Dismissible(
+              key: Key(task.id.toString()),
+              background: Container(color: TummaTausta),
+              onDismissed: (direction) {
+                DatabaseHelper.deleteTask(task.id!);
+                _loadTodos();
+              },
+              child: CheckboxListTile( // checkbox jolla voi säätää onko tehtävä done vai ei
+                title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
+                value: task.done,
+                onChanged: (bool? newValue) {
+                  if (newValue != null) {
+                    final updatedTask = Task(title: task.title, done: newValue, id: task.id);
+                    DatabaseHelper.updateTask(updatedTask);
+                    _loadTodos();
+                  }
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

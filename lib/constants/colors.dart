@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// sovelluksen värien määritykset
 const Color Tausta = Color(0xFF1F1F1F);
 const Color TummaTausta = Color(0xFF181818);
 const Color Sininen = Color(0xFFA3DAFF);
