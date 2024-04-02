@@ -2,6 +2,7 @@ import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'daily.dart';
 import 'todo.dart';
 import 'info.dart';
+import 'constants/colors.dart'; // värit
 
 void main() { // pääohjelma
   runApp(const MyApp()); // käynnistetään myapp sovellus
@@ -52,7 +53,7 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
     return Scaffold( // palautetaan sivuston runko
       appBar: AppBar( // yläpalkki
         toolbarHeight: 110, // korkeus kovakoodattu jotta logo on sopiva
-        backgroundColor:Color(0xFF181818), // yläpalkin taustaväri
+        backgroundColor:TummaTausta, // yläpalkin taustaväri
         title: Center(child: Image.asset('images/logo.png')), // logo keskellä
       ),
       body: Center(
@@ -75,10 +76,10 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
     ],
     currentIndex: valittuIndexi,
     onTap: _onItemTapped, // kun klikataan alavalikkoa
-        backgroundColor: Color(0xFF181818), //alavalikon taustaväri
-        selectedItemColor: Color(0xFF67D0B2), // valitun kohteen väri
+        backgroundColor: TummaTausta, //alavalikon taustaväri
+        selectedItemColor: Turkoosi, // valitun kohteen väri
         selectedIconTheme: IconThemeData(size: 40),
-        unselectedItemColor: Color(0xFFA3DAFF), // valitsemattoman kohteen väri
+        unselectedItemColor: Sininen, // valitsemattoman kohteen väri
         unselectedIconTheme: IconThemeData(size: 30),
         selectedLabelStyle: TextStyle(
           fontWeight: FontWeight.bold,
@@ -90,7 +91,7 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
           fontFamily: 'FireCode',
           fontSize: 20,), // valitsemattoman labelin tyyli
       ),
-      backgroundColor:  Color(0xFF1F1F1F), // scaffoldin taustaväri
+      backgroundColor:  Tausta // scaffoldin taustaväri
     );
   }
 }

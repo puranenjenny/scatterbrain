@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+import 'package:scatter_brain/constants/colors.dart'; 
 
 class DailySivu extends StatelessWidget {
   @override
@@ -7,9 +8,9 @@ class DailySivu extends StatelessWidget {
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
 
     return Scaffold(
-      backgroundColor: Color(0xFF1F1F1F),
+      backgroundColor: Tausta,
       appBar: AppBar(
-          backgroundColor: Color(0xFF1F1F1F),
+          backgroundColor: Tausta,
           toolbarHeight: 97,
           title: Padding(
             padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 0), 
@@ -18,12 +19,12 @@ class DailySivu extends StatelessWidget {
               children: [
                 Text('Daily Tasks',
                     style: TextStyle(
-                        color: Color(0xFFA3DAFF),
+                        color: Sininen,
                         fontSize: 50,
                         fontFamily: 'GochiHand')),
                 Text(formattedDate, // päivämäärä
                     style: TextStyle(
-                        color: Color(0xFFA3DAFF),
+                        color: Sininen,
                         fontSize: 20, 
                         fontFamily: 'GochiHand'))
               ],

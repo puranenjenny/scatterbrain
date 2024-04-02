@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scatter_brain/constants/colors.dart';
 
 class ToDoSivu extends StatefulWidget {
   @override
@@ -23,18 +24,18 @@ class _ToDoSivuState extends State<ToDoSivu> { // todo sivu luokka
         final TextEditingController _textFieldController = TextEditingController(); // tekstikentän controller
 
         return AlertDialog( // palautetaan alertdialog
-          title: Text('Add a task', style: TextStyle(color: Color(0xFFA3DAFF), fontFamily: 'GochiHand', fontSize: 30)),
-          backgroundColor: Color(0xFF1F1F1F),
+          title: Text('Add a task', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
+          backgroundColor: Tausta,
           content: TextField(
-            style: TextStyle(color: Color(0xFFA3DAFF), fontFamily: 'FiraCode'),
+            style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
             controller: _textFieldController,
-            decoration: InputDecoration(hintText: "Write a task here..." ,hintStyle: TextStyle(color: Color(0xFFA3DAFF), 
-            fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFA3DAFF))), 
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFA3DAFF)))),
+            decoration: InputDecoration(hintText: "Write a task here..." ,hintStyle: TextStyle(color: Sininen, 
+            fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), 
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Add', style: TextStyle(color: Color(0xFFA3DAFF), fontFamily: 'FiraCode')),
+              child: Text('Add', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
               onPressed: () {
                 _addTodoItem(_textFieldController.text);
                 Navigator.of(context).pop();
