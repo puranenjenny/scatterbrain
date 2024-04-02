@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
-import 'daily.dart';
-import 'todo.dart';
-import 'info.dart';
+import 'daily_sivu.dart';
+import 'todo_sivu.dart';
+import 'info_sivu.dart';
 import 'constants/colors.dart'; // värit
 
 void main() { // pääohjelma
