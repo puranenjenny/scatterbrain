@@ -78,20 +78,21 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
     onTap: _onItemTapped, // kun klikataan alavalikkoa
         backgroundColor: TummaTausta, //alavalikon taustaväri
         selectedItemColor: Turkoosi, // valitun kohteen väri
-        selectedIconTheme: IconThemeData(size: 40),
+        selectedIconTheme: IconThemeData(size: 40), //valitun iconin koko
         unselectedItemColor: Sininen, // valitsemattoman kohteen väri
-        unselectedIconTheme: IconThemeData(size: 30),
-        selectedLabelStyle: TextStyle(
-          fontWeight: FontWeight.bold,
+        unselectedIconTheme: IconThemeData(size: 30), // valitsemattoman iconin koko
+        selectedLabelStyle: TextStyle( // valitun labelin tekstisäädöt
+          fontWeight: FontWeight.bold, // lihavoitu
           fontFamily: 'FireCode',
           fontSize: 20,
-          ),  // valitun labelin tyyli
-        unselectedLabelStyle: TextStyle(
+          ), 
+        unselectedLabelStyle: TextStyle( // valitsemattoman labelin tekstisäädöt
           fontWeight: FontWeight.normal,
           fontFamily: 'FireCode',
-          fontSize: 20,), // valitsemattoman labelin tyyli
+          fontSize: 20,
+          ),
       ),
-      backgroundColor:  Tausta // scaffoldin taustaväri
+      backgroundColor: Tausta // scaffoldin taustaväri
     );
   }
 }
