@@ -8,7 +8,7 @@ class InfoSivu extends StatelessWidget {
       backgroundColor: Tausta,
       appBar: AppBar(
         backgroundColor: Tausta,
-        toolbarHeight: 90,
+        toolbarHeight: 98,
         title: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
           child: Text('Info', style: TextStyle(color:Sininen, fontSize: 50, fontFamily: 'GochiHand')),

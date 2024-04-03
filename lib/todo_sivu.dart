@@ -185,7 +185,7 @@ void _showAddDailyTaskDialog() {
       backgroundColor: Tausta,
       appBar: AppBar(
         backgroundColor: Tausta,
-        toolbarHeight: 90,
+        toolbarHeight: 98,
         title: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
           child: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
@@ -195,19 +195,22 @@ void _showAddDailyTaskDialog() {
             icon: Image.asset('images/btn_add.png', width: 44, height: 44), //lisää nappi
             onPressed: _showAddTodoDialog,
           ),
-          IconButton(
-            icon: Image.asset('images/trash2.png', width: 44, height: 44), // poista nappi
-            onPressed: _showDeleteTodoDialog,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Image.asset('images/trash2.png', width: 44, height: 44), // poista nappi
+              onPressed: _showDeleteTodoDialog,
+            ),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
-        child: Container(
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25),
+        child: Container( // container joka sisältää listan
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("images/tausta_todo.png"), // Taustakuva
-              fit: BoxFit.cover,
+              image: AssetImage("images/tausta_todo.png"), // taustakuva
+              fit: BoxFit.fill, // fill täyttää koko alueen
             ),
           ),
           child: ListView.builder(

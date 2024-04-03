@@ -13,6 +13,7 @@ class _DailySivuState extends State<DailySivu> {
   List<Daily> _morningDailys = [];
   List<Daily> _eveningDailys = [];
 
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +57,20 @@ class _DailySivuState extends State<DailySivu> {
   );
   }
 
+  String _getBackgroundImage() {
+    bool allMorningDone = _morningDailys.isNotEmpty && _morningDailys.every((task) => task.done);
+    bool allEveningDone = _eveningDailys.isNotEmpty && _eveningDailys.every((task) => task.done);
+
+    if (allMorningDone && !allEveningDone) {
+      return "images/tausta_aamu.png";
+    } else if (allMorningDone && allEveningDone) {
+      return "images/tausta_ilta.png";
+    } else {
+      return "images/tausta_alku.png";
+    }
+  }
+
+
  @override
 Widget build(BuildContext context) {
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
@@ -79,7 +94,7 @@ Widget build(BuildContext context) {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: const EdgeInsets.only(left: 30),
                 child: Text(formattedDate, style: TextStyle(color: PilkutBeessi, fontSize: 15, fontFamily: 'FiraCode')),
               ),
             ],
@@ -91,8 +106,8 @@ Widget build(BuildContext context) {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("images/tausta_aamu.png"), // Taustakuva
-                fit: BoxFit.cover, // Muuta BoxFit.coveriksi, jotta se peittää koko alueen
+                image: AssetImage(_getBackgroundImage()), // haetaan taustakuva
+                fit: BoxFit.cover, // täyttää koko alueen
               ),
             ),
           ),
