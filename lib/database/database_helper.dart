@@ -93,6 +93,18 @@ static Future<List<Daily>?> getDailyTasks() async {
   });
 }
 
+// daily tehtävien nollaus ja tarkistus
+
+static Future<void> resetAllDailysToNotDone() async {
+  final Database db = await _getDB();
+  await db.execute("UPDATE DailyTasks SET done = 0");
+}
+
+static Future<bool> areAllTasksDone() async {
+  final Database db = await _getDB();
+  final List<Map<String, dynamic>> tasks = await db.query('DailyTasks', where: 'done = 0');
+  return tasks.isEmpty;
+}
 
 
 }
