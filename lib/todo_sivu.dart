@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:scatter_brain/database/daily_model.dart';
 import 'package:scatter_brain/database/database_helper.dart';
-import 'package:scatter_brain/database/task_model.dart'; // Säädä import-polku projektisi rakenteen mukaan
-import 'package:scatter_brain/constants/colors.dart'; // Varmista, että tämä polku on oikein
+import 'package:scatter_brain/database/task_model.dart'; 
+import 'package:scatter_brain/constants/colors.dart'; 
 
 class ToDoSivu extends StatefulWidget {
   const ToDoSivu({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class ToDoSivu extends StatefulWidget {
 class _ToDoSivuState extends State<ToDoSivu> {
   List<Task> _todos = [];
   final TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _dailyTextFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -45,7 +47,7 @@ void _loadTodos() async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add a task', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
+          title: Text('ADD A TASK', style: TextStyle(color: Turkoosi, fontFamily: 'GochiHand', fontSize: 30)),
           backgroundColor: Tausta,
           content: TextField(
             style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
@@ -56,13 +58,22 @@ void _loadTodos() async {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys
               children: [
-/*                 IconButton(
-                icon: Icon(Icons.add, color: Sininen), // Voit vaihtaa ikonin tarpeesi mukaan
-                onPressed: () {
-                  _showAddtoDailyDialog();
-                },), */
                 TextButton(
-                  child: Text('Save', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showAddDailyTaskDialog();
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Minimoi Row'n leveyden sen sisällön mukaan
+                    children: <Widget>[
+                      Image.asset('images/daily.png', width: 30, height: 30), // Säädä kuvan kokoa tarpeen mukaan
+                      SizedBox(width: 8), // Lisää väliä kuvan ja tekstin välille
+                      Text('DAILY', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  child: Text('SAVE', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
                   onPressed: () {
                     if (_textFieldController.text.isNotEmpty) {
                       final newTask = Task(title: _textFieldController.text, done: false);
@@ -81,16 +92,81 @@ void _loadTodos() async {
     );
   }
 
-  void _showDeleteTodoDialog() {
+String _selectedTimeOfDay = 'Morning';
+
+void _showAddDailyTaskDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('ADD A DAILY TASK', style: TextStyle(color: Pinkki, fontFamily: 'GochiHand', fontSize: 30)),
+        backgroundColor: Tausta,
+        content: SingleChildScrollView( // Tämä varmistaa, että kaikki mahtuu näkyviin
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Säätää koon sisällön mukaan
+            children: <Widget>[
+              TextField(
+                style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
+                controller: _dailyTextFieldController,
+                decoration: InputDecoration(hintText: "Write a daily task here...", hintStyle: TextStyle(color: Sininen, fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
+              ),
+              SizedBox(height: 20),
+              DropdownButton<String>(
+                value: _selectedTimeOfDay,
+                onChanged: (String? newValue) {
+                  // Tässä kohdassa setState voi olla tarpeeton, riippuen sovelluksesi rakenteesta
+                  _selectedTimeOfDay = newValue!;
+                },
+                items: <String>['Morning', 'Evening', ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys
+              children: [
+                TextButton(
+                  child: Text('CANCEL', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('SAVE', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                  onPressed: () {
+                    if (_dailyTextFieldController.text.isNotEmpty) {
+                      final newDaily = Daily(title: _dailyTextFieldController.text, done: false, timeOfDay: _selectedTimeOfDay,);
+                      DatabaseHelper.addDailyTask(newDaily);
+                      _dailyTextFieldController.clear();
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  void _showDeleteTodoDialog() { // poista valitut tehtävät dialogi
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete selected', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
+          title: Text('DELETE SELECTED', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
           backgroundColor: Tausta,
           actions: <Widget>[
             TextButton(
-              child: Text('Click here to delete', style: TextStyle(color: Sininen, fontFamily: 'FiraCode')),
+              child: Text('Click here to delete', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
               onPressed: () {
                 DatabaseHelper.deleteSelectedTasks();
                 _loadTodos();
@@ -110,7 +186,10 @@ void _loadTodos() async {
       appBar: AppBar(
         backgroundColor: Tausta,
         toolbarHeight: 90,
-        title: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
+          child: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Image.asset('images/btn_add.png', width: 44, height: 44), //lisää nappi
@@ -122,37 +201,40 @@ void _loadTodos() async {
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/tausta_todo.png"), // Taustakuva
-            fit: BoxFit.cover,
+      body: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("images/tausta_todo.png"), // Taustakuva
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: ListView.builder(
-          itemCount: _todos.length,
-          itemBuilder: (context, index) {
-            final task = _todos[index];
-            return Dismissible(
-              key: Key(task.id.toString()),
-              background: Container(color: TummaTausta),
-              onDismissed: (direction) {
-                DatabaseHelper.deleteTask(task.id!);
-                _loadTodos();
-              },
-              child: CheckboxListTile( // checkbox jolla voi säätää onko tehtävä done vai ei
-                title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
-                value: task.done,
-                onChanged: (bool? newValue) {
-                  if (newValue != null) {
-                    final updatedTask = Task(title: task.title, done: newValue, id: task.id);
-                    DatabaseHelper.updateTask(updatedTask);
-                    _loadTodos();
-                  }
+          child: ListView.builder(
+            itemCount: _todos.length,
+            itemBuilder: (context, index) {
+              final task = _todos[index];
+              return Dismissible(
+                key: Key(task.id.toString()),
+                background: Container(color: TummaTausta),
+                onDismissed: (direction) {
+                  DatabaseHelper.deleteTask(task.id!);
+                  _loadTodos();
                 },
-              ),
-            );
-          },
+                child: CheckboxListTile( // checkbox jolla voi säätää onko tehtävä done vai ei
+                  title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
+                  value: task.done,
+                  onChanged: (bool? newValue) {
+                    if (newValue != null) {
+                      final updatedTask = Task(title: task.title, done: newValue, id: task.id);
+                      DatabaseHelper.updateTask(updatedTask);
+                      _loadTodos();
+                    }
+                  },
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
