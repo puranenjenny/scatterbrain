@@ -1,5 +1,3 @@
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -81,7 +79,7 @@ static show5SecondsNotification({
     return showAjastettuNotification(id: id, title: title, body: body, payload: payload, scheduledDate: scheduledDate);
   }
 
-  // Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä
+/*   // Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä
   static Future showWeeklyNotification({
     int id = 0,
     String? title,
@@ -89,9 +87,34 @@ static show5SecondsNotification({
     String? payload,
     required List<int> days,
   }) async {
-    final scheduledDate = _ajastaWeekly(Time(10, 0), days: days);
+    final scheduledDate = _ajastaWeekly(Time(2, 0), days: days);
     return showAjastettuNotification(id: id, title: title, body: body, payload: payload, scheduledDate: scheduledDate, matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime);
-  }
+  } */
+
+// Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä klo 14:55
+static Future showWeeklyNotification({
+  int id = 0,
+  String? title,
+  String? body,
+  String? payload,
+  required List<int> days,
+}) async {
+  // Määritä aika klo 14:55
+  final Time time = Time(14, 55);
+
+  // Ajasta ilmoitus käyttäen _ajastaWeekly-apufunktiota ja annettuja viikonpäiviä
+  final scheduledDate = _ajastaWeekly(time, days: [0, 1, 2, 3, 4,]);
+
+  // Käytä showAjastettuNotification-funktiota ilmoituksen näyttämiseen
+  return showAjastettuNotification(
+    id: id,
+    title: title,
+    body: body,
+    payload: payload,
+    scheduledDate: scheduledDate,
+    matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+  );
+}
 
   // Apumetodit
   static Future showAjastettuNotification({

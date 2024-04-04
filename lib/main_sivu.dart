@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
-import 'package:scatter_brain/api/notification_api.dart';
+import 'package:scatter_brain/notifications/notification_helper.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'daily_sivu.dart';
 import 'todo_sivu.dart';
@@ -19,6 +19,9 @@ void main() async {
   var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+    AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 
   
 
@@ -52,7 +55,7 @@ void scheduleMorningTasks() {
 Future<void> _showNotification() async {
   var androidDetails = AndroidNotificationDetails('channelId', 'channelName');
   var generalNotificationDetails = NotificationDetails(android: androidDetails);
-  await flutterLocalNotificationsPlugin.show(0, 'Reminder', 'You have unfinished tasks!', generalNotificationDetails);
+  await flutterLocalNotificationsPlugin.show(0, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
 }
 
 void resetDailyTasks() async {
@@ -75,8 +78,6 @@ AndroidAlarmManager.periodic(
   wakeup: true,
 );
 } */
-
-
 
 
 class MyApp extends StatelessWidget { // myapp sovellus

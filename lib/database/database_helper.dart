@@ -1,7 +1,8 @@
-import 'package:scatter_brain/database/daily_model.dart';
+import 'package:scatter_brain/database/daily_model.dart'; // daily luokka
+import 'package:scatter_brain/database/task_model.dart'; // task luokka
 import 'package:sqflite/sqflite.dart'; // sqflite kirjasto tietokannan käyttöön
 import 'package:path/path.dart'; // path kirjasto
-import 'package:scatter_brain/database/task_model.dart'; // task luokka
+
 
 class DatabaseHelper { // tietokannan apuluokka
   static const int _version = 1; // tietokannan versio
@@ -49,7 +50,7 @@ class DatabaseHelper { // tietokannan apuluokka
   static Future<List<Task>?> getTasks() async { // hae tehtävät funktio
     final db = await _getDB(); // hae tietokanta
     
-    final List<Map<String, dynamic>> maps = await db.query('Task', orderBy: 'id DESC'); // hae tehtävät tietokannasta ja järjestä id:n mukaan laskevasti
+    final List<Map<String, dynamic>> maps = await db.query('Task', orderBy: 'id DESC'); // hae tehtävät tietokannasta ja järjestä id:n mukaan laskevasti eli uusin ylös
 
     if(maps.isEmpty) return null; // jos tehtävät ovat tyhjiä, palauta null
 
@@ -82,7 +83,7 @@ static Future<int> deleteDailyTask(int id) async {
     'DailyTasks', where: 'id = ?', whereArgs: [id]);
 }
 
-static Future<List<Daily>?> getDailyTasks() async {
+static Future<List<Daily>?> getDailyTasks() async { // hae kaikki daily tehtävät
   final db = await _getDB();
   final List<Map<String, dynamic>> maps = await db.query('DailyTasks');
 
@@ -95,16 +96,15 @@ static Future<List<Daily>?> getDailyTasks() async {
 
 // daily tehtävien nollaus ja tarkistus
 
-static Future<void> resetAllDailysToNotDone() async {
+static Future<void> resetAllDailysToNotDone() async { // nollaa kaikki tehtävät joka päivä klo 5
   final Database db = await _getDB();
   await db.execute("UPDATE DailyTasks SET done = 0");
 }
 
-static Future<bool> areAllTasksDone() async {
+static Future<bool> areAllTasksDone() async { // tarkista onko kaikki tehtävät tehty, jotta voidaan päivittää kissakuvaa daily sivulla
   final Database db = await _getDB();
   final List<Map<String, dynamic>> tasks = await db.query('DailyTasks', where: 'done = 0');
   return tasks.isEmpty;
 }
-
 
 }

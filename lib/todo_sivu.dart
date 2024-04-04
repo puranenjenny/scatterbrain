@@ -219,7 +219,13 @@ void _showAddDailyTaskDialog() {
               final task = _todos[index];
               return Dismissible(
                 key: Key(task.id.toString()),
-                background: Container(color: TummaTausta),
+                direction: DismissDirection.startToEnd,
+                background: Container(
+                  color: TummaTausta,
+                  child: Icon(Icons.delete, color: Pinkki),
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  ),
                 onDismissed: (direction) {
                   DatabaseHelper.deleteTask(task.id!);
                   _loadTodos();
