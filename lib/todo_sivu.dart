@@ -129,7 +129,7 @@ void _showAddDailyTaskDialog() {
         ),
         actions: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys ja väli
               children: [
                 TextButton(
                   child: Text('CANCEL', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
@@ -185,7 +185,7 @@ void _showAddDailyTaskDialog() {
       backgroundColor: Tausta,
       appBar: AppBar(
         backgroundColor: Tausta,
-        toolbarHeight: 98,
+        toolbarHeight: 88,
         title: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
           child: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),

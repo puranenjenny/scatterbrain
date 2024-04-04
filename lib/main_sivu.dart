@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
+import 'package:scatter_brain/api/notification_api.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'daily_sivu.dart';
 import 'todo_sivu.dart';
@@ -7,20 +8,31 @@ import 'constants/colors.dart'; // värit
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await AndroidAlarmManager.initialize();
+  WidgetsFlutterBinding.ensureInitialized(); // varmistetaan, että widgetit on alustettu
+  AndroidAlarmManager.initialize(); // alustetaan android alarm manager
+  NotificationApi.init(); // alustetaan ilmoitukset
 
-/*   var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+  var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings); */
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  
 
   runApp(MyApp());
 }
 
-/* void scheduleMorningTasks() {
+/* void requestExactAlarmPermission() {
+  final AndroidIntent intent = AndroidIntent(
+    action: 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
+  );
+  intent.launch();
+} */
+
+void scheduleMorningTasks() {
   final morningStart = DateTime.now().add(Duration(days: 1)).subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute)); // Seuraavan päivän klo 00:00
   final morningEnd = morningStart.add(Duration(hours: 13)); // Seuraavan päivän klo 13:00
   for (DateTime time = morningStart.add(Duration(hours: 10)); time.isBefore(morningEnd); time = time.add(Duration(minutes: 10))) {
@@ -35,20 +47,20 @@ void main() async {
   if (!areTasksDone) {
     _showNotification();
   }
-} */
-/*
+} 
+
 Future<void> _showNotification() async {
   var androidDetails = AndroidNotificationDetails('channelId', 'channelName');
   var generalNotificationDetails = NotificationDetails(android: androidDetails);
   await flutterLocalNotificationsPlugin.show(0, 'Reminder', 'You have unfinished tasks!', generalNotificationDetails);
-} */
+}
 
 void resetDailyTasks() async {
   // Kutsu DatabaseHelper:in funktiota asettaaksesi kaikki daily tehtävät done: false
   await DatabaseHelper.resetAllDailysToNotDone();
 }
 
-void scheduleDailyTaskReset() {
+/* void scheduleDailyTaskReset() {
   final int alarmId = 1;
   final DateTime now = DateTime.now();
   final DateTime firstInstance = DateTime(now.year, now.month, now.day, 5);
@@ -62,7 +74,10 @@ AndroidAlarmManager.periodic(
   exact: true,
   wakeup: true,
 );
-}
+} */
+
+
+
 
 class MyApp extends StatelessWidget { // myapp sovellus
   const MyApp({super.key}); // konstruktori
@@ -97,6 +112,7 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
       valittuIndexi = index; // asetetaan valittu sivu
     });
   }
+
 
   @override
   Widget build(BuildContext context) { // rakennetaan kotisivu

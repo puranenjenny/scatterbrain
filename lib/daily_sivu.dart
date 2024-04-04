@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:scatter_brain/api/notification_api.dart';
 import 'package:intl/intl.dart';
 import 'package:scatter_brain/constants/colors.dart';
 import 'package:scatter_brain/database/daily_model.dart';
 import 'package:scatter_brain/database/database_helper.dart'; 
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class DailySivu extends StatefulWidget {
   @override
@@ -17,6 +20,7 @@ class _DailySivuState extends State<DailySivu> {
   @override
   void initState() {
     super.initState();
+    tz.initializeTimeZones();
     _loadDailys();
   }
 
@@ -79,9 +83,9 @@ Widget build(BuildContext context) {
       backgroundColor: Tausta,
       appBar: AppBar(
         backgroundColor: Tausta,
-        toolbarHeight: 98,
+        toolbarHeight: 108,
         title: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 0),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,11 +117,48 @@ Widget build(BuildContext context) {
           ),
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 14, right: 14, top: 0, bottom: 14),
               child: Column(
                 children: [
                   _buildTaskList(_morningDailys, "Morning Tasks"),
                   _buildTaskList(_eveningDailys, "Evening Tasks"),
+                  _buildButton(
+                    title: 'Show Notification',
+                    icon: Icon(Icons.notifications), // Use an icon widget directly
+                    onPressed: () async {
+                      await NotificationApi.showNotification(
+                        title: 'Reminder',
+                        body: 'You have unfinished tasks!',
+                        payload: 'payload', // payload tarkoittaa tietoa joka voidaan lähettää notifikaation mukana, optional
+                      );
+                    },
+                  ),
+/*                   _buildButton(
+                    title: 'Show Notification in 5 seconds (Scheduled)',
+                    icon: Icon(Icons.notifications), // Use an icon widget directly
+                    onPressed: () async {
+                      await NotificationApi.show5SecondsNotification(
+                        title: 'Reminder',
+                        body: 'You have unfinished tasks!',
+                        payload: 'payload', // payload tarkoittaa tietoa joka voidaan lähettää notifikaation mukana, optional
+                        scheduledDate: scheduledDate,
+                      );
+                    },
+                  ), */
+                  _buildButton(
+                    title: 'Show Notification in 5 seconds (Scheduled)',
+                    icon: Icon(Icons.notifications),
+                    onPressed: () async {
+                      final tz.TZDateTime scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
+                      await NotificationApi.show5SecondsNotification(
+                        id: 1, // Uniikki ID jokaiselle ilmoitukselle
+                        title: 'Reminder',
+                        body: 'You have unfinished tasks!',
+                        payload: 'payload',
+                        scheduledDate: scheduledDate, // Ajastettu aika
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -126,4 +167,21 @@ Widget build(BuildContext context) {
       ),
     );
 }
+
+Widget _buildButton({required String title, required Widget icon, required VoidCallback onPressed}) {
+  return ElevatedButton.icon(
+    icon: icon,
+    label: Text(title),
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Sininen,
+      foregroundColor: TummaTausta,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(32.0),
+      ),
+    ),
+  );
+}
+
+
 }
