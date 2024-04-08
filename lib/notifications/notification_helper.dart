@@ -2,6 +2,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+
+class Time {
+  final int hour;
+  final int minute;
+
+  Time(this.hour, this.minute);
+}
+
 class NotificationApi {
   static final _notifications = FlutterLocalNotificationsPlugin();
 
@@ -19,7 +27,6 @@ class NotificationApi {
     tz.initializeTimeZones();
     await _notifications.initialize(initializationSettings);
   }
-
 
   static Future _notificationDetails() async {
     return NotificationDetails(
@@ -53,13 +60,13 @@ static show5SecondsNotification({
     String? title,
     String? body,
     String? payload,
-    required tz.TZDateTime scheduledDate, // Lisää tämä rivi
+    required tz.TZDateTime scheduledDate, 
   }) async =>
     _notifications.zonedSchedule(
       id,
       title,
       body,
-      scheduledDate, // Käytä tätä arvoa
+      scheduledDate, 
       await _notificationDetails(),
       payload: payload,
       androidScheduleMode: AndroidScheduleMode.exact,
@@ -79,19 +86,9 @@ static show5SecondsNotification({
     return showAjastettuNotification(id: id, title: title, body: body, payload: payload, scheduledDate: scheduledDate);
   }
 
-/*   // Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä
-  static Future showWeeklyNotification({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
-    required List<int> days,
-  }) async {
-    final scheduledDate = _ajastaWeekly(Time(2, 0), days: days);
-    return showAjastettuNotification(id: id, title: title, body: body, payload: payload, scheduledDate: scheduledDate, matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime);
-  } */
 
-// Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä klo 14:55
+
+/* // Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä klo 14:55
 static Future showWeeklyNotification({
   int id = 0,
   String? title,
@@ -114,7 +111,7 @@ static Future showWeeklyNotification({
     scheduledDate: scheduledDate,
     matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
   );
-}
+} */
 
   // Apumetodit
   static Future showAjastettuNotification({
@@ -150,11 +147,15 @@ static Future showWeeklyNotification({
     }
     return scheduledDate;
   }
+
+
+// sulje kaikki ilmoitukset
+  static Future cancelAll() async {
+    await _notifications.cancelAll();
+  }
+
+
+
 }
 
-class Time {
-  final int hour;
-  final int minute;
 
-  Time(this.hour, this.minute);
-}

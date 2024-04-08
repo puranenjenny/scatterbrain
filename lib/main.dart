@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
+import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'daily_sivu.dart';
@@ -11,9 +12,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // varmistetaan, että widgetit on alustettu
-  AndroidAlarmManager.initialize(); // alustetaan android alarm manager
+  await AndroidAlarmManager.initialize(); // alustetaan android alarm manager
   NotificationApi.init(); // alustetaan ilmoitukset
 
   var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -23,9 +25,48 @@ void main() async {
   flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
     AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 
-  
+  await Permission.notification.isDenied.then((value) // jos notificationeja ei ole sallittu
+  {
+    if (value) {
+      Permission.notification.request(); // pyydetään notification oikeudet
+    }
+  });
 
+  scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
   runApp(MyApp());
+  /* final int dailyResetId = 1;
+  await AndroidAlarmManager.periodic(const Duration(minutes: 1), dailyResetId, resetDailyTasks); */
+}
+
+// tehtävien resetointi
+
+@pragma('vm:entry-point') // hattu joka pakottaa funktion suoritettavaksi myös taustalla
+void resetDailyTasks() async { // resetoi päivittäiset tehtävät
+  await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
+}
+
+void scheduleDailyReset() async { // aikataulutetaan päivittäinen resetointi klo 5 aamulla
+  final int alarmId = 2; // uniikki ID hälytykselle
+  final DateTime now = DateTime.now();
+  final DateTime firstTime = DateTime(now.year, now.month, now.day, 5, 0, 0); 
+  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime;
+
+  await AndroidAlarmManager.periodic(
+    const Duration(days: 1),
+    alarmId, 
+    resetDailyTasks,
+    startAt: scheduleTime,
+    exact: true,
+    wakeup: true,
+  );
+}
+
+// notificationit
+
+Future<void> _showNotification() async {
+  var androidDetails = AndroidNotificationDetails('channelId', 'channelName');
+  var generalNotificationDetails = NotificationDetails(android: androidDetails);
+  await flutterLocalNotificationsPlugin.show(3, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
 }
 
 /* void requestExactAlarmPermission() {
@@ -35,32 +76,21 @@ void main() async {
   intent.launch();
 } */
 
-void scheduleMorningTasks() {
+/* void scheduleMorningTasks() {
   final morningStart = DateTime.now().add(Duration(days: 1)).subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute)); // Seuraavan päivän klo 00:00
   final morningEnd = morningStart.add(Duration(hours: 13)); // Seuraavan päivän klo 13:00
   for (DateTime time = morningStart.add(Duration(hours: 10)); time.isBefore(morningEnd); time = time.add(Duration(minutes: 10))) {
     int alarmId = 1;
     AndroidAlarmManager.oneShotAt(time, alarmId, checkAndNotifyTasks, exact: true, wakeup: true);
   }
-}
+} */
 
- void checkAndNotifyTasks() async {
-  // Tarkista, onko tehtävät tehty. Oletetaan, että onTehtavatTehty palauttaa 'true', jos kaikki tehtävät on tehty.
+ void checkAndNotifyTasks() async {  // tarkistetaan että tehtävät on tehny, palauttaa 'true'
   bool areTasksDone = await DatabaseHelper.areAllTasksDone();
   if (!areTasksDone) {
     _showNotification();
   }
 } 
-
-Future<void> _showNotification() async {
-  var androidDetails = AndroidNotificationDetails('channelId', 'channelName');
-  var generalNotificationDetails = NotificationDetails(android: androidDetails);
-  await flutterLocalNotificationsPlugin.show(0, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
-}
-
-void resetDailyTasks() async {
-  await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
-}
 
 /* void scheduleDailyTaskReset() {
   final int alarmId = 1;

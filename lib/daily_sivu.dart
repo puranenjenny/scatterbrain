@@ -57,8 +57,8 @@ child: Dismissible(
     final result = await showDialog( //varmistusikkuna
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Remove daily task'),
-        content: Text('Do you want to delete this daily task?'),
+        title: Text('Remove Daily task'),
+        content: Text('Do you want to delete this Daily task?'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -204,7 +204,7 @@ return Scaffold(
                     _loadDailys();
                   },
                 ),
-                _buildButton(
+               /*  _buildButton(
                   title: 'Weekly notification',
                   icon: Icon(Icons.alarm),
                   onPressed: () async {
@@ -216,7 +216,7 @@ return Scaffold(
                       days: [DateTime.monday, DateTime.wednesday, DateTime.friday],
                     );
                   },
-                ),
+                ), */
                 ],
               ),
             ),
@@ -241,6 +241,5 @@ Widget _buildButton({required String title, required Widget icon, required VoidC
     ),
   );
 }
-
 
 }
