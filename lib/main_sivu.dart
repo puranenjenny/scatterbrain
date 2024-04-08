@@ -59,8 +59,7 @@ Future<void> _showNotification() async {
 }
 
 void resetDailyTasks() async {
-  // Kutsu DatabaseHelper:in funktiota asettaaksesi kaikki daily tehtävät done: false
-  await DatabaseHelper.resetAllDailysToNotDone();
+  await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
 }
 
 /* void scheduleDailyTaskReset() {

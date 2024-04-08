@@ -40,13 +40,12 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
     children: [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Text(title, style: TextStyle(fontSize: 24, color: Sininen, fontFamily: 'GochiHand')),
+        child: Text(title, style: TextStyle(fontSize: 26, color: Turkoosi, fontFamily: 'GochiHand')),
       ),
-      // Käytä ListView.builder sijaan Column widgettia paremman suorituskyvyn ja skaalautuvuuden takaamiseksi
       ListView.builder(
-        shrinkWrap: true, // Tämä estää ListView.builderia ottamasta koko näytön korkeutta
-        physics: NeverScrollableScrollPhysics(), // Estää listan sisäisen scrollauksen
-        itemCount: tasks.length,
+        shrinkWrap: true, // estää ListView.builderia ottamasta koko näytön korkeutta
+        physics: NeverScrollableScrollPhysics(), // estää listan sisäisen scrollauksen
+        itemCount: tasks.length, 
         itemBuilder: (context, index) {
           final task = tasks[index];
           return Padding(
@@ -90,7 +89,7 @@ child: Dismissible(
     padding: EdgeInsets.symmetric(horizontal: 20.0),
   ),
               child: CheckboxListTile(
-                title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
+                title: Text(task.title, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 20)),
                 value: task.done,
                 onChanged: (bool? newValue) {
                   if (newValue != null) {
