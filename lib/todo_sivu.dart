@@ -47,12 +47,12 @@ void _loadTodos() async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('ADD A TASK', style: TextStyle(color: Turkoosi, fontFamily: 'GochiHand', fontSize: 30)),
+          title: Text('Add Task', style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 30)),
           backgroundColor: Tausta,
           content: TextField(
             style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
             controller: _textFieldController,
-            decoration: InputDecoration(hintText: "Write a task here...", hintStyle: TextStyle(color: Sininen, fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
+            decoration: InputDecoration(hintText: "Write a task here...", hintStyle: TextStyle(color: Sininen, fontFamily: 'GochiHand',fontSize: 18), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
           ),
           actions: <Widget>[
             Row(
@@ -92,44 +92,59 @@ void _loadTodos() async {
     );
   }
 
-String _selectedTimeOfDay = 'Morning';
+String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
 
-void _showAddDailyTaskDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('ADD A DAILY TASK', style: TextStyle(color: Pinkki, fontFamily: 'GochiHand', fontSize: 30)),
-        backgroundColor: Tausta,
-        content: SingleChildScrollView( // Tämä varmistaa, että kaikki mahtuu näkyviin
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Säätää koon sisällön mukaan
-            children: <Widget>[
-              TextField(
-                style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
-                controller: _dailyTextFieldController,
-                decoration: InputDecoration(hintText: "Write a daily task here...", hintStyle: TextStyle(color: Sininen, fontFamily: 'FiraCode'), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)), focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))),
-              ),
-              SizedBox(height: 20),
-              DropdownButton<String>(
-                value: _selectedTimeOfDay,
-                onChanged: (String? newValue) {
-                  // Tässä kohdassa setState voi olla tarpeeton, riippuen sovelluksesi rakenteesta
-                  _selectedTimeOfDay = newValue!;
-                },
-                items: <String>['Morning', 'Evening', ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
-                  );
-                }).toList(),
-              ),
-            ],
+  void _showAddDailyTaskDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Daily Task', style: TextStyle(color: Pinkki, fontFamily: 'FiraCode', fontSize: 30)),
+          backgroundColor: Tausta, 
+          content: StatefulBuilder(  // StatefulBuilderia käytetään tilan päivittämiseen dialogin sisällä
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      style: TextStyle(color: Sininen, fontFamily: 'FiraCode'),
+                      controller: _dailyTextFieldController,
+                      decoration: InputDecoration(
+                        hintText: "Write a daily task here...",
+                        hintStyle: TextStyle(color: Sininen, fontFamily: 'GochiHand',fontSize: 18),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen)),
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Sininen))
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        canvasColor: Tausta, 
+                      ),
+                      child: DropdownButton<String>(
+                        value: _selectedTimeOfDay,
+                        onChanged: (String? newValue) {
+                          setState(() { 
+                            _selectedTimeOfDay = newValue!;
+                          });
+                        },
+                        items: <String>['Morning', 'Evening'].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
           ),
-        ),
-        actions: <Widget>[
+          actions: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // rivin keskitys ja väli
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   child: Text('CANCEL', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
@@ -137,18 +152,22 @@ void _showAddDailyTaskDialog() {
                     Navigator.of(context).pop();
                   },
                 ),
-                TextButton(
-                  child: Text('SAVE', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
-                  onPressed: () {
-                    if (_dailyTextFieldController.text.isNotEmpty) {
-                      final newDaily = Daily(title: _dailyTextFieldController.text, done: false, timeOfDay: _selectedTimeOfDay,);
-                      DatabaseHelper.addDailyTask(newDaily);
-                      _dailyTextFieldController.clear();
-                    }
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+            TextButton(
+              child: Text('SAVE', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+              onPressed: () {
+                if (_dailyTextFieldController.text.isNotEmpty) {
+                  final newDaily = Daily(
+                    title: _dailyTextFieldController.text,
+                    done: false,
+                    timeOfDay: _selectedTimeOfDay, 
+                  );
+                  DatabaseHelper.addDailyTask(newDaily);
+                  _dailyTextFieldController.clear();
+                  Navigator.of(context).pop();
+                }
+              },
+            ), 
+            ],  
             ),
           ],
         );

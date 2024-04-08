@@ -72,14 +72,14 @@ child: Dismissible(
       ),
     );
 
-    // Palauta true jos käyttäjä vahvistaa poiston, muuten false
-    return result ?? false;
+    
+    return result ?? false;// palautetaan true jos käyttäjä vahvistaa poiston, muuten false
   },
   onDismissed: (direction) {
-    // Poista tehtävä tietokannasta, jos käyttäjä vahvistaa poiston
-    DatabaseHelper.deleteDailyTask(task.id!);
+    
+    DatabaseHelper.deleteDailyTask(task.id!);// poistetaan tehtävä tietokannasta, jos käyttäjä vahvistaa poiston
     setState(() {
-      tasks.removeAt(index); // Poista tehtävä listalta
+      tasks.removeAt(index); // poistetaan tehtävä listalta
     });
   },
   background: Container(
@@ -158,7 +158,7 @@ return Scaffold(
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(_getBackgroundImage()), // haetaan taustakuva
-              fit: BoxFit.cover, // täyttää koko alueen
+              fit: BoxFit.contain, // täyttää koko alueen
             ),
           ),
         ),
