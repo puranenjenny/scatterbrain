@@ -155,10 +155,11 @@ return Scaffold(
     body: Stack(
       children: [
         Container(
+          margin: EdgeInsets.only(top: 110), // kisuli vain pilkistää alapalkin alta
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(_getBackgroundImage()), // haetaan taustakuva
-              fit: BoxFit.contain, // täyttää koko alueen
+              fit: BoxFit.cover// täyttää koko alueen
             ),
           ),
         ),
@@ -181,18 +182,6 @@ return Scaffold(
                     );
                   },
                 ),
-          /*                   _buildButton(
-                  title: 'Show Notification in 5 seconds (Scheduled)',
-                  icon: Icon(Icons.notifications), // Use an icon widget directly
-                  onPressed: () async {
-                    await NotificationApi.show5SecondsNotification(
-                      title: 'Reminder',
-                      body: 'You have unfinished tasks!',
-                      payload: 'payload', // payload tarkoittaa tietoa joka voidaan lähettää notifikaation mukana, optional
-                      scheduledDate: scheduledDate,
-                    );
-                  },
-                ), */
                 _buildButton(
                   title: 'Show Notification in 5 seconds (Scheduled)',
                   icon: Icon(Icons.notifications),
