@@ -47,12 +47,14 @@ class _InfoSivuState extends State<InfoSivu> {
         )),
        body: Stack(
         children: [
-          Container(
-            margin: EdgeInsets.only(top: 110), // kisuli vain pilkistää alapalkin alta
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("images/tausta_info.png"), // taustakuva
-                fit: BoxFit.fill,
+          Opacity(
+            opacity: 0.48,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/tausta_info.png"), // taustakuva
+                  fit: BoxFit.fill,
+                ),
               ),
             ),
           ),

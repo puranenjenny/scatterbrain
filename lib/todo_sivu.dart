@@ -62,6 +62,7 @@ void _loadTodos() async {
                   onPressed: () {
                     Navigator.of(context).pop();
                     _showAddDailyTaskDialog();
+                    _textFieldController.clear();//reset _textFieldController
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min, // Minimoi Row'n leveyden sen sisällön mukaan
@@ -181,16 +182,27 @@ String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('DELETE SELECTED', style: TextStyle(color: Sininen, fontFamily: 'GochiHand', fontSize: 30)),
+          title: Text('Delete selected', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 30)),
           backgroundColor: Tausta,
           actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                      child: Text('CANCEL', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
             TextButton(
-              child: Text('Click here to delete', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
+              child: Text('DELETE', style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 18)),
               onPressed: () {
                 DatabaseHelper.deleteSelectedTasks();
                 _loadTodos();
                 Navigator.of(context).pop();
               },
+            ),                          
+            ],
             ),
           ],
         );
@@ -223,48 +235,49 @@ String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25),
-        child: Container( // container joka sisältää listan
+      body: Container( // container joka sisältää listan
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("images/tausta_todo.png"), // taustakuva
               fit: BoxFit.fill, // fill täyttää koko alueen
             ),
           ),
-          child: ListView.builder(
-            itemCount: _todos.length,
-            itemBuilder: (context, index) {
-              final task = _todos[index];
-              return Dismissible(
-                key: Key(task.id.toString()),
-                direction: DismissDirection.startToEnd,
-                background: Container(
-                  color: TummaTausta,
-                  child: Icon(Icons.delete, color: Pinkki),
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  ),
-                onDismissed: (direction) {
-                  DatabaseHelper.deleteTask(task.id!);
-                  _loadTodos();
-                },
-                child: CheckboxListTile( // checkbox jolla voi säätää onko tehtävä done vai ei
-                  title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
-                  value: task.done,
-                  onChanged: (bool? newValue) {
-                    if (newValue != null) {
-                      final updatedTask = Task(title: task.title, done: newValue, id: task.id);
-                      DatabaseHelper.updateTask(updatedTask);
-                      _loadTodos();
-                    }
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25),
+            child: ListView.builder(
+              itemCount: _todos.length,
+              itemBuilder: (context, index) {
+                final task = _todos[index];
+                return Dismissible(
+                  key: Key(task.id.toString()),
+                  direction: DismissDirection.startToEnd,
+                  background: Container(
+                    color: TummaTausta,
+                    child: Icon(Icons.delete, color: Pinkki),
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    ),
+                  onDismissed: (direction) {
+                    DatabaseHelper.deleteTask(task.id!);
+                    _loadTodos();
                   },
-                ),
-              );
-            },
+                  child: CheckboxListTile( // checkbox jolla voi säätää onko tehtävä done vai ei
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(task.title, style: TextStyle(color: Turkoosi, fontFamily: 'FiraCode', fontSize: 20)),
+                    value: task.done,
+                    onChanged: (bool? newValue) {
+                      if (newValue != null) {
+                        final updatedTask = Task(title: task.title, done: newValue, id: task.id);
+                        DatabaseHelper.updateTask(updatedTask);
+                        _loadTodos();
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
           ),
         ),
-      ),
     );
   }
 }

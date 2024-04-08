@@ -16,6 +16,9 @@ class _DailySivuState extends State<DailySivu> {
   List<Daily> _morningDailys = [];
   List<Daily> _eveningDailys = [];
 
+  bool morningMessageShown = false;
+  bool eveningMessageShown = false;
+
 
   @override
   void initState() {
@@ -27,12 +30,15 @@ class _DailySivuState extends State<DailySivu> {
   void _loadDailys() async {
     final dailys = await DatabaseHelper.getDailyTasks();
     if (dailys != null) {
-      setState(() {
-        _morningDailys = dailys.where((daily) => daily.timeOfDay == 'Morning').toList();
-        _eveningDailys = dailys.where((daily) => daily.timeOfDay == 'Evening').toList();
-      });
+      if (mounted) { // Tarkista onko widget vielä kiinnitetty ennen tilan päivitystä
+        setState(() {
+          _morningDailys = dailys.where((daily) => daily.timeOfDay == 'Morning').toList();
+          _eveningDailys = dailys.where((daily) => daily.timeOfDay == 'Evening').toList();
+        }
+      );
     }
   }
+}
 
 Widget _buildTaskList(List<Daily> tasks, String title) {
   return Column(
@@ -50,52 +56,50 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
           final task = tasks[index];
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-child: Dismissible(
-  key: Key(task.id.toString()), // uniikki avain jokaiselle tehtävälle
-  direction: DismissDirection.endToStart, // sallii pyyhkäisyn vain oikealta vasemmalle
-  confirmDismiss: (direction) async {
-    final result = await showDialog( //varmistusikkuna
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Remove Daily task'),
-        content: Text('Do you want to delete this Daily task?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel'),
+    child: Dismissible(
+      key: Key(task.id.toString()), // uniikki avain jokaiselle tehtävälle
+      direction: DismissDirection.endToStart, // sallii pyyhkäisyn vain oikealta vasemmalle
+      confirmDismiss: (direction) async {
+        final result = await showDialog( //varmistusikkuna
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Remove Daily task'),
+            content: Text('Do you want to delete this Daily task?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Delete'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    
+        );
     return result ?? false;// palautetaan true jos käyttäjä vahvistaa poiston, muuten false
   },
-  onDismissed: (direction) {
-    
+  onDismissed: (direction) { // kun tehtävä poistetaan
     DatabaseHelper.deleteDailyTask(task.id!);// poistetaan tehtävä tietokannasta, jos käyttäjä vahvistaa poiston
-    setState(() {
+    setState(() { // päivitetään tila
       tasks.removeAt(index); // poistetaan tehtävä listalta
     });
   },
-  background: Container(
+  background: Container(  
     color: TummaTausta,
-    child: Icon(Icons.delete, color: Pinkki),
-    alignment: Alignment.centerRight,
-    padding: EdgeInsets.symmetric(horizontal: 20.0),
+    child: Icon(Icons.delete, color: Pinkki), // roskakorin ikoni
+    alignment: Alignment.centerRight, // keskitetään ikoni oikealle
+    padding: EdgeInsets.symmetric(horizontal: 20.0), // lisätään tyhjää ikonin ympärille
   ),
-              child: CheckboxListTile(
-                title: Text(task.title, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 20)),
-                value: task.done,
-                onChanged: (bool? newValue) {
-                  if (newValue != null) {
-                    final updatedTask = Daily(title: task.title, done: newValue, id: task.id, timeOfDay: task.timeOfDay);
-                    DatabaseHelper.updateDailyTask(updatedTask);
-                    _loadDailys();
+      child: CheckboxListTile( // tehtävälista
+        controlAffinity: ListTileControlAffinity.leading, // checkbox vasemmalla
+        title: Text(task.title, style: TextStyle(color: Sininen, fontFamily: 'FiraCode', fontSize: 20)), // tehtävän nimi
+        value: task.done, // onko tehtävä tehty
+        onChanged: (bool? newValue) { // kun tehtävän tila muuttuu
+          if (newValue != null) { // jos uusi arvo ei ole null
+            final updatedTask = Daily(title: task.title, done: newValue, id: task.id, timeOfDay: task.timeOfDay); // päivitetään tehtävä
+            DatabaseHelper.updateDailyTask(updatedTask); // päivitetään tehtävä tietokantaan
+            _loadDailys(); // ladataan tehtävät uudelleen
                   }
                 },
               ),
@@ -112,9 +116,23 @@ child: Dismissible(
     bool allMorningDone = _morningDailys.isNotEmpty && _morningDailys.every((task) => task.done);
     bool allEveningDone = _eveningDailys.isNotEmpty && _eveningDailys.every((task) => task.done);
 
-    if (allMorningDone && !allEveningDone) {
+    if (allMorningDone && !allEveningDone && !morningMessageShown) {
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Center(child: Text('Yay! You did all the morning things! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
+          ),
+        );
+      });
+      morningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen
       return "images/tausta_aamu.png";
-    } else if (allMorningDone && allEveningDone) {
+    } else if (allMorningDone && allEveningDone && !eveningMessageShown) {
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Center(child: Text('Yay! All done! Time to rest! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
+          ),
+        );
+      });
+      eveningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen
       return "images/tausta_ilta.png";
     } else {
       return "images/tausta_alku.png";
@@ -154,12 +172,17 @@ return Scaffold(
     ),
     body: Stack(
       children: [
-        Container(
-          margin: EdgeInsets.only(top: 110), // kisuli vain pilkistää alapalkin alta
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(_getBackgroundImage()), // haetaan taustakuva
-              fit: BoxFit.cover// täyttää koko alueen
+        SafeArea(
+          child: Opacity(
+            opacity: 0.7,
+            child: Container(
+              alignment: Alignment.bottomRight,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(_getBackgroundImage()), // haetaan taustakuva
+                  fit: BoxFit.contain// täyttää koko alueen
+                ),
+              ),
             ),
           ),
         ),
@@ -204,19 +227,6 @@ return Scaffold(
                     _loadDailys();
                   },
                 ),
-               /*  _buildButton(
-                  title: 'Weekly notification',
-                  icon: Icon(Icons.alarm),
-                  onPressed: () async {
-                    NotificationApi.showWeeklyNotification(
-                      id: 2,
-                      title: 'Weekly reminder',
-                      body: 'You have unfinished tasks!',
-                      payload: 'payload',
-                      days: [DateTime.monday, DateTime.wednesday, DateTime.friday],
-                    );
-                  },
-                ), */
                 ],
               ),
             ),

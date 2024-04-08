@@ -2,7 +2,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-
 class Time {
   final int hour;
   final int minute;
@@ -86,33 +85,6 @@ static show5SecondsNotification({
     return showAjastettuNotification(id: id, title: title, body: body, payload: payload, scheduledDate: scheduledDate);
   }
 
-
-
-/* // Vaihtoehto 3: Ilmoitus tiettyinä viikonpäivinä klo 14:55
-static Future showWeeklyNotification({
-  int id = 0,
-  String? title,
-  String? body,
-  String? payload,
-  required List<int> days,
-}) async {
-  // Määritä aika klo 14:55
-  final Time time = Time(14, 55);
-
-  // Ajasta ilmoitus käyttäen _ajastaWeekly-apufunktiota ja annettuja viikonpäiviä
-  final scheduledDate = _ajastaWeekly(time, days: [0, 1, 2, 3, 4,]);
-
-  // Käytä showAjastettuNotification-funktiota ilmoituksen näyttämiseen
-  return showAjastettuNotification(
-    id: id,
-    title: title,
-    body: body,
-    payload: payload,
-    scheduledDate: scheduledDate,
-    matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-  );
-} */
-
   // Apumetodit
   static Future showAjastettuNotification({
     int id = 0,
@@ -140,20 +112,12 @@ static Future showWeeklyNotification({
     return scheduledDate.isBefore(now) ? scheduledDate.add(const Duration(days: 1)) : scheduledDate;
   }
 
-  static tz.TZDateTime _ajastaWeekly(Time time, {required List<int> days}) {
-    tz.TZDateTime scheduledDate = _ajastaDaily(time);
-    while (!days.contains(scheduledDate.weekday)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-    return scheduledDate;
-  }
 
 
 // sulje kaikki ilmoitukset
   static Future cancelAll() async {
     await _notifications.cancelAll();
   }
-
 
 
 }
