@@ -3,7 +3,8 @@ import 'package:scatter_brain/notifications/notification_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:scatter_brain/constants/colors.dart';
 import 'package:scatter_brain/database/daily_model.dart';
-import 'package:scatter_brain/database/database_helper.dart'; 
+import 'package:scatter_brain/database/database_helper.dart';
+import 'package:scatter_brain/notifications/shared_helper.dart'; 
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -16,9 +17,6 @@ class _DailySivuState extends State<DailySivu> {
   List<Daily> _morningDailys = [];
   List<Daily> _eveningDailys = [];
 
-/*   bool morningMessageShown = false;
-  bool eveningMessageShown = false; */
-
 
   @override
   void initState() {
@@ -30,10 +28,20 @@ class _DailySivuState extends State<DailySivu> {
   void _loadDailys() async {
     final dailys = await DatabaseHelper.getDailyTasks();
     if (dailys != null) {
-      if (mounted) { // Tarkista onko widget vielä kiinnitetty ennen tilan päivitystä
+      if (mounted) { // tarkistetaan onko widget vielä kiinnitetty ennen tilan päivitystä jotta vältytään virheiltä kun käyttäjä liikkuu liian nopeasti apissa
         setState(() {
           _morningDailys = dailys.where((daily) => daily.timeOfDay == 'Morning').toList();
           _eveningDailys = dailys.where((daily) => daily.timeOfDay == 'Evening').toList();
+
+            // tarkistetaan ovatko kaikki tehtävät valmiita
+          bool allMorningDone = _morningDailys.isNotEmpty && _morningDailys.every((task) => task.done);
+          bool allEveningDone = _eveningDailys.isNotEmpty && _eveningDailys.every((task) => task.done);
+
+          // tallennetaan tulokset
+          SharedPreferencesHelper.setBool('allMorningDone', allMorningDone);
+          SharedPreferencesHelper.setBool('allEveningDone', allEveningDone);
+
+          _checkCompletedTasks();
         }
       );
     }
@@ -97,7 +105,12 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
         value: task.done, // onko tehtävä tehty
         onChanged: (bool? newValue) { // kun tehtävän tila muuttuu
           if (newValue != null) { // jos uusi arvo ei ole null
-            final updatedTask = Daily(title: task.title, done: newValue, id: task.id, timeOfDay: task.timeOfDay); // päivitetään tehtävä
+            final updatedTask = Daily( // päivitetään tehtävä
+              title: task.title, 
+              done: newValue, 
+              id: task.id, 
+              timeOfDay: task.timeOfDay
+              ); 
             DatabaseHelper.updateDailyTask(updatedTask); // päivitetään tehtävä tietokantaan
             _loadDailys(); // ladataan tehtävät uudelleen
                   }
@@ -117,27 +130,41 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
     bool allEveningDone = _eveningDailys.isNotEmpty && _eveningDailys.every((task) => task.done);
 
     if (allMorningDone && !allEveningDone) {
-/*       Future.delayed(Duration.zero, () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Center(child: Text('Yay! You did all the morning things! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
-          ),
-        );
-      });
-      morningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen */
       return "images/tausta_aamu.png";
     } else if (allMorningDone && allEveningDone) {
-/*       Future.delayed(Duration.zero, () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Center(child: Text('Yay! All done! Time to rest! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
-          ),
-        );
-      });
-      eveningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen */
       return "images/tausta_ilta.png";
     } else {
       return "images/tausta_alku.png";
     }
   }
+
+Future<bool> _checkCompletedTasks() async {
+  bool allMorningDone = await SharedPreferencesHelper.getBool('allMorningDone');
+  bool allEveningDone = await SharedPreferencesHelper.getBool('allEveningDone');
+  bool morningMessageShown = await SharedPreferencesHelper.getBool('morningMessageShown');
+  bool eveningMessageShown = await SharedPreferencesHelper.getBool('eveningMessageShown');
+
+  if (allMorningDone && !allEveningDone && !morningMessageShown) { // jos kaikki aamutehtävät on tehty
+      WidgetsBinding.instance.addPostFrameCallback((_) { // näytetään snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Center(child: Text('Yay! You did all the morning things! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
+          ),
+        );
+      });
+      await SharedPreferencesHelper.setBool('morningMessageShown', true); // tallennetaan että aamuviesti on näytetty 
+
+    } else if (allMorningDone && allEveningDone && !eveningMessageShown) { // jos kaikki tehtävät on tehty
+      WidgetsBinding.instance.addPostFrameCallback((_) { // näytetään snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Center(child: Text('Yay! All done! Time to rest! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
+          ),
+        );
+      });
+      await SharedPreferencesHelper.setBool('eveningMessageShown', true); // tallennetaan että iltaviesti on näytetty
+    }
+    return false; // palautetaan false
+}
+    
 
 
  @override

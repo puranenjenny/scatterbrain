@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scatter_brain/constants/colors.dart';
+import 'package:scatter_brain/notifications/shared_helper.dart';
+
 class InfoSivu extends StatefulWidget {
   @override
   _InfoSivuState createState() => _InfoSivuState();
@@ -85,7 +87,7 @@ class _InfoSivuState extends State<InfoSivu> {
                       title: Text('Removing tasks', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
                       children: <Widget>[
                         Padding(
-                          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0, bottom: 0),
+                          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0, bottom: 20),
                           child: Text(
                             'In the to-do tab, you can remove all selected tasks by tapping the trash can icon or one by one by swiping the task from left to right. If you want to remove a Daily task, swipe from right to left and confirm.',
                             style: TextStyle(color: Sininen, fontSize: 18, fontFamily: 'FiraCode'),
@@ -107,10 +109,11 @@ class _InfoSivuState extends State<InfoSivu> {
                           ), child:
                         DropdownButtonFormField<String>(
                           value: selectedMorningTime,
-                          onChanged: (newValue) {
+                          onChanged: (newValue) async {
                             setState(() {
                               selectedMorningTime = newValue!;
                             });
+                            await SharedPreferencesHelper.setString('selectedMorningTime', selectedMorningTime);
                           },
                           items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
@@ -134,10 +137,11 @@ class _InfoSivuState extends State<InfoSivu> {
                       ), child:
                     DropdownButtonFormField<String>( // illan notifikatioiden dropdown
                       value: selectedEveningTime,
-                      onChanged: (newValue) {
+                      onChanged: (newValue) async {
                         setState(() {
                           selectedEveningTime = newValue!;
                         });
+                        await SharedPreferencesHelper.setString('selectedEveningTime', selectedEveningTime);
                       },
                       items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -160,10 +164,11 @@ class _InfoSivuState extends State<InfoSivu> {
                       ), child:
                     DropdownButtonFormField<String>(// notificatioiden tiheys dropdown
                       value: selectedFrequency,
-                      onChanged: (newValue) {
+                      onChanged: (newValue) async {
                         setState(() {
                           selectedFrequency = newValue!;
                         });
+                        await SharedPreferencesHelper.setString('selectedFrequency', selectedFrequency);
                       },
                       items: frequencyOptions.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -195,11 +200,11 @@ class _InfoSivuState extends State<InfoSivu> {
                                   Text('OFF', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
                                   Switch(
                                     value: notificationsEnabled,
-                                    onChanged: (value) {
+                                    onChanged: (value) async {
                                       setState(() {
                                         notificationsEnabled = value;
-                                        // Add logic here to enable/disable notifications
                                       });
+                                      await SharedPreferencesHelper.setBool('notificationsEnabled', notificationsEnabled);
                                     },
                                     activeColor: Turkoosi,
                                   ),
@@ -220,10 +225,11 @@ class _InfoSivuState extends State<InfoSivu> {
                                   ), child:
                               DropdownButtonFormField<String>( // päivittäisen resetoinnin aika
                                 value: dailyResetTime,
-                                onChanged: (newValue) {
+                                onChanged: (newValue) async {
                                   setState(() {
                                     dailyResetTime = newValue!;
                                   });
+                                 await SharedPreferencesHelper.setString('dailyResetTime', dailyResetTime);
                                 },
                                 items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(

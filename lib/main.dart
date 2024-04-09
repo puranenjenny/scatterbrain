@@ -2,6 +2,7 @@ import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
 import 'package:scatter_brain/database/database_helper.dart';
+import 'package:scatter_brain/notifications/shared_helper.dart';
 import 'daily_sivu.dart';
 import 'todo_sivu.dart';
 import 'info_sivu.dart';
@@ -32,6 +33,7 @@ void main() async {
     }
   });
 
+  await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
   scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
   runApp(MyApp());
   /* final int dailyResetId = 1;
@@ -49,10 +51,10 @@ void scheduleDailyReset() async { // aikataulutetaan päivittäinen resetointi k
   final int alarmId = 2; // uniikki ID hälytykselle
   final DateTime now = DateTime.now();
   final DateTime firstTime = DateTime(now.year, now.month, now.day, 5, 0, 0); 
-  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime;
+  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(minutes: 1)) : firstTime;
 
   await AndroidAlarmManager.periodic(
-    const Duration(days: 1),
+    const Duration(minutes: 1),
     alarmId, 
     resetDailyTasks,
     startAt: scheduleTime,
