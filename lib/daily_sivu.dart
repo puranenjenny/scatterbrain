@@ -238,13 +238,7 @@ return Scaffold(
                   icon: Icon(Icons.notifications),
                   onPressed: () async {
                     final tz.TZDateTime scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
-                    await NotificationApi.show5SecondsNotification(
-                      id: 1, // Uniikki ID jokaiselle ilmoitukselle
-                      title: 'Hello there! 😊',
-                      body: 'You have unfinished tasks! Do not sink in too deep before completing them!',
-                      payload: 'payload',
-                      scheduledDate: scheduledDate, // Ajastettu aika
-                    );
+                    await NotificationApi.show5SecondsNotification(id: 0, scheduledDate: scheduledDate);
                   },
                 ),
                 _buildButton(

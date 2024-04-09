@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
@@ -19,6 +21,8 @@ void main() async {
   await AndroidAlarmManager.initialize(); // alustetaan android alarm manager
   NotificationApi.init(); // alustetaan ilmoitukset
 
+  Timer.periodic(Duration(minutes: 1), (Timer t) => printCurrentTime());  // timeri testaukseen
+
   var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -29,14 +33,29 @@ void main() async {
   await Permission.notification.isDenied.then((value) // jos notificationeja ei ole sallittu
   {
     if (value) {
-      Permission.notification.request(); // pyydetään notification oikeudet
+      Permission.notification.request(); // pyydetään notification oikeudet uudemmissa android malleissa
     }
   });
 
   await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
+
+
+  bool notificationsEnabled = SharedPreferencesHelper.getBool('notificationsEnabled'); // varmistetaan että ilmoitukset käynnistyvät käyttäjän määrittelemien asetusten mukaisesti
+  if (notificationsEnabled) {
+    NotificationApi.scheduleMorningNotifications();
+    NotificationApi.scheduleEveningNotifications();
+    print("notifikaatiot on päällä: $notificationsEnabled" );
+  }
+
   scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
   runApp(MyApp()); // käynnistetään sovellus
 
+}
+
+//timeri
+void printCurrentTime() {
+  final DateTime now = DateTime.now();
+  print("Current time: $now");
 }
 
 // tehtävien resetointi
@@ -46,28 +65,15 @@ void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
 }
 
-void scheduleDailyResetTesti() async { // aikataulutetaan päivittäinen resetointi klo 5 aamulla
-  final int alarmId = 2; // uniikki ID hälytykselle
-  final DateTime now = DateTime.now();
-  final DateTime firstTime = DateTime(now.year, now.month, now.day, 5, 0, 0); 
-  final DateTime scheduleTime2 = firstTime.isBefore(now) ? firstTime.add(Duration(minutes: 1)) : firstTime;
-
-  await AndroidAlarmManager.periodic(
-    const Duration(minutes: 1),
-    alarmId, 
-    resetDailyTasks,
-    startAt: scheduleTime2,
-    exact: true,
-    wakeup: true,
-  );
-}
-
+@pragma('vm:entry-point')
 void scheduleDailyReset() async {
-  final int alarmId = 3; // Uniikki ID hälytykselle
+  final int alarmId = 3; // uniikki ID hälytykselle
   
   String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime'); // haetaan aikataulu shared preferencesista
-  List<String> timeParts = dailyResetTime.split(':'); // pilkotaan aikataulu osiin tunti ja minuutti
   print(dailyResetTime);
+  List<String> timeParts = dailyResetTime.split(':'); // pilkotaan aikataulu osiin tunti ja minuutti
+  print(timeParts);
+
 try {
   int hour = int.parse(timeParts[0]);
   int minute = int.parse(timeParts[1]);
@@ -76,6 +82,7 @@ try {
   final DateTime firstTime = DateTime(now.year, now.month, now.day, hour, minute, 0); // asetetaan aika ja siihen haluttu tunti ja minuutti
   final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime; // jos aika on jo mennyt, asetetaan seuraava päivä
 
+  print(now);
   await AndroidAlarmManager.periodic( // aikataulutettu resetointi periodisesti
     Duration(days: 1), // suoritetaan kerran päivässä
     alarmId, // uniikki ID
@@ -85,13 +92,12 @@ try {
     wakeup: true, // herätetään laite jos se on nukkumassa ja ajettaan taustalla
   );
 } catch (e) {
-  // Käsittely virheelle, esimerkiksi asetetaan oletusaika tai logitetaan virhe
   print('Error parsing daily reset time: $e');
   return;
 }
 
-
 }
+
 
 // notificationit
 
@@ -100,13 +106,6 @@ Future<void> _showNotification() async {
   var generalNotificationDetails = NotificationDetails(android: androidDetails);
   await flutterLocalNotificationsPlugin.show(3, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
 }
-
-/* void requestExactAlarmPermission() {
-  final AndroidIntent intent = AndroidIntent(
-    action: 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
-  );
-  intent.launch();
-} */
 
 /* void scheduleMorningTasks() {
   final morningStart = DateTime.now().add(Duration(days: 1)).subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute)); // Seuraavan päivän klo 00:00
@@ -117,29 +116,13 @@ Future<void> _showNotification() async {
   }
 } */
 
+
  void checkAndNotifyTasks() async {  // tarkistetaan että tehtävät on tehny, palauttaa 'true'
   bool areTasksDone = await DatabaseHelper.areAllTasksDone();
   if (!areTasksDone) {
     _showNotification();
   }
-} 
-
-/* void scheduleDailyTaskReset() {
-  final int alarmId = 1;
-  final DateTime now = DateTime.now();
-  final DateTime firstInstance = DateTime(now.year, now.month, now.day, 5);
-  final DateTime alarmTime = firstInstance.isBefore(now) ? firstInstance.add(Duration(minutes: 1)) : firstInstance;
-  
-AndroidAlarmManager.periodic(
-  const Duration(minutes: 1), // Testausta varten, vaihda takaisin sopivaan arvoon myöhemmin
-  alarmId,
-  resetDailyTasks,
-  startAt: alarmTime,
-  exact: true,
-  wakeup: true,
-);
-} */
-
+}
 
 class MyApp extends StatelessWidget { // myapp sovellus
   const MyApp({super.key}); // konstruktori

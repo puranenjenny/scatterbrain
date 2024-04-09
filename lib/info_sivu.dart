@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scatter_brain/constants/colors.dart';
+import 'package:scatter_brain/main.dart';
 import 'package:scatter_brain/notifications/shared_helper.dart';
+import 'package:scatter_brain/notifications/notification_helper.dart';
 
 
 class InfoSivu extends StatefulWidget {
@@ -88,8 +90,10 @@ void _loadSelections() async {
                 padding: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 20),
                 child: Column(
                   children: [
-                    Center(child: Text('This app is designed for all of us scatterbrains to stay on top of our morning and evening routines, as well as everyday errands. ', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode'))),
-                    SizedBox(height: 20),
+                    Center(child: Text('This app is designed for all of us scatterbrains to stay on top of our morning and evening routines, as well as everyday errands. ',
+                        style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')
+                    )
+                    ),
 
                     ExpansionTile( // taskien lisäys-ohjeet
                       title: Text('Adding tasks', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
@@ -103,7 +107,6 @@ void _loadSelections() async {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
 
                     ExpansionTile( // taskien poisto-ohjeet
                       title: Text('Removing tasks', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
@@ -117,10 +120,9 @@ void _loadSelections() async {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
             
                     ExpansionTile(// aamu notifikaatioiden dropdown valikko
-                      title: Text('Setting reminders', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
+                      title: Text('Notification settings', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
                       children: <Widget>[
                         Text('You can set reminders and the frequency for your daily tasks here. The notifications stops when you complete all your morning or evening tasks and starts again the next day.', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
                         SizedBox(height: 20),
@@ -131,12 +133,14 @@ void _loadSelections() async {
                           ), child:
                         DropdownButtonFormField<String>(
                           value: selectedMorningTime,
-                            onChanged: (newValue) async {
-                              if (newValue != null) {
-                                setState(() { selectedMorningTime = newValue; });
-                                await SharedPreferencesHelper.setString('selectedMorningTime', newValue);
-                              }
-                            },
+                          onChanged: (newValue) async {
+                            if (newValue != null) {
+                              setState(() { selectedMorningTime = newValue; });
+                              await SharedPreferencesHelper.setString('selectedMorningTime', newValue);
+                              NotificationApi.scheduleMorningNotifications();
+                              print("Morning notifications set at $selectedMorningTime");
+                            }
+                          },
                           items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -163,6 +167,8 @@ void _loadSelections() async {
                         if (newValue != null) {
                           setState(() { selectedEveningTime = newValue; });
                           await SharedPreferencesHelper.setString('selectedEveningTime', newValue);
+                          NotificationApi.scheduleEveningNotifications();
+                          print("Evening notifications set at $selectedEveningTime");
                         }
                       },
                       items: timeOptions.map<DropdownMenuItem<String>>((String value) {
@@ -190,6 +196,9 @@ void _loadSelections() async {
                         if (newValue != null) {
                           setState(() { selectedFrequency = newValue; });
                           await SharedPreferencesHelper.setString('selectedFrequency', newValue);
+                          NotificationApi.scheduleEveningNotifications();
+                          NotificationApi.scheduleMorningNotifications();
+                          print("Notification frequency set at $selectedFrequency");
                         }
                       },
                       items: frequencyOptions.map<DropdownMenuItem<String>>((String value) {
@@ -205,42 +214,48 @@ void _loadSelections() async {
                       ),
                     ),
                     ),
+
+                        SizedBox(height: 20),
+                        Text(
+                          'Here you can toggle notifications on and off. If you turn them off, you will not receive any notifications for your daily tasks. You can turn them back on at any time.',
+                          style: TextStyle(color: Sininen, fontSize: 18, fontFamily: 'FiraCode'),
+
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text('OFF', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
+                            Switch(
+                              value: notificationsEnabled,
+                              onChanged: (newValue) async {
+                                  setState(() {
+                                    notificationsEnabled = newValue;
+                                  });
+                                  await SharedPreferencesHelper.setBool(
+                                      'notificationsEnabled', newValue);
+                              },
+                              activeColor: Turkoosi,
+                            ),
+                            Text('ON', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
+                          ],
+                        ),
+                        SizedBox(height: 20),
                     ],
                     ),
-                    SizedBox(height: 20),
                     
                     ExpansionTile( // notifikaatioiden päälle/pois
-                      title: Text('Notifications and daily reset', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
+                      title: Text('Daily reset', style: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode')),
                       children: <Widget>[
                         Padding(
-                          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0, bottom: 0),
+                          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10, bottom: 20),
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text('OFF', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
-                                  Switch(
-                                    value: notificationsEnabled,
-                                    onChanged: (value) async {
-                                      setState(() {
-                                        notificationsEnabled = value; 
-                                      });
-                                      await SharedPreferencesHelper.setBool('notificationsEnabled', value);
-                                    },
-                                    activeColor: Turkoosi,
-                                  ),
-                                  Text('ON', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode')),
-                                ],
-                              ),
-                              SizedBox(height: 10),
                               Text(
-                                'Here you can toggle notifications on and off. If you turn them off, you will not receive any notifications for your daily tasks. You can turn them back on at any time.',
+                                'The reset time clears your Daily tasks, preparing you for a fresh start each day.',
                                 style: TextStyle(color: Sininen, fontSize: 18, fontFamily: 'FiraCode'),
-                                
                               ),
-                              
-                              SizedBox(height: 20),
+                              SizedBox(height: 30),
                                 Theme(
                                   data: Theme.of(context).copyWith(
                                     canvasColor: Tausta, // taustaväri dropdown valikolle
@@ -250,8 +265,10 @@ void _loadSelections() async {
                                  onChanged: (newValue) async {
                                   if (newValue != null) {
                                     setState(() { dailyResetTime = newValue; });
-                                    print("Scheduling daily reset at: $dailyResetTime");
                                     await SharedPreferencesHelper.setString('dailyResetTime', newValue);
+                                    scheduleDailyReset();
+                                    print("Scheduling daily reset at: $dailyResetTime");
+
                                   }
                                 },
                                 items: timeOptions.map<DropdownMenuItem<String>>((String value) {
@@ -264,15 +281,11 @@ void _loadSelections() async {
                                   labelText: "Daily Reset Time",
                                   labelStyle: TextStyle(color: Turkoosi, fontSize: 20, fontFamily: 'FiraCode'),
                                   border: OutlineInputBorder(),
+
                                 ),
                               ),
                                                   ),
-                              SizedBox(height: 20),
-                              Text(
-                                'The reset time clears your Daily tasks, preparing you for a fresh start each day.',
-                                style: TextStyle(color: Sininen, fontSize: 18, fontFamily: 'FiraCode'),
-                              ),
-                              SizedBox(height: 20),
+
                             ],
 
                           
@@ -280,7 +293,6 @@ void _loadSelections() async {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
                     Center(child: Text('We hope Scatterbrain helps you keep track of your daily tasks and makes your life a little bit easier. ✨', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode'))),
                     SizedBox(height: 20),
                   ],
