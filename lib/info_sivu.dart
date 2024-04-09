@@ -2,22 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:scatter_brain/constants/colors.dart';
 import 'package:scatter_brain/notifications/shared_helper.dart';
 
+
 class InfoSivu extends StatefulWidget {
   @override
   _InfoSivuState createState() => _InfoSivuState();
 }
 
+
 class _InfoSivuState extends State<InfoSivu> {
-  // Initialize the selected times as the first option in the dropdown
-  String selectedMorningTime = '10:00';
+
+  String selectedMorningTime = '10:00'; // alustetaan muuttujat
   String selectedEveningTime = '22:00';
   String selectedFrequency = '10';
   String dailyResetTime = '05:00';
-
   bool notificationsEnabled = true; // ilmoitukset päällä
 
-  // luopdaan aamu ja iltapäivä notifikaatioiden aika vaihtoehdot listaan puolen tunnin välein
-  List<String> generateTimeOptions() {
+
+@override
+void initState() {
+  super.initState();
+  _loadSelections();
+}
+
+void _loadSelections() async {
+  selectedMorningTime = await SharedPreferencesHelper.getString('selectedMorningTime', defaultValue: '10:00');
+  selectedEveningTime = await SharedPreferencesHelper.getString('selectedEveningTime', defaultValue: '22:00');
+  selectedFrequency = await SharedPreferencesHelper.getString('selectedFrequency', defaultValue: '10');
+  dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime', defaultValue: '05:00');
+  notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled', defaultValue: true);
+  
+  setState(() {
+    selectedMorningTime = selectedMorningTime;
+    selectedEveningTime = selectedEveningTime;
+    selectedFrequency = selectedFrequency;
+    dailyResetTime = dailyResetTime;
+    notificationsEnabled = notificationsEnabled;
+  });
+}
+  
+  List<String> generateTimeOptions() { // luopdaan aamu ja iltapäivä notifikaatioiden aika vaihtoehdot listaan puolen tunnin välein
     List<String> times = [];
     for (int hour = 0; hour < 24; hour++) {
       for (int minute = 0; minute < 60; minute += 30) {
@@ -28,8 +51,7 @@ class _InfoSivuState extends State<InfoSivu> {
     return times;
   }
 
-  // luodaan notifikaatioiden tiheys vaihtoehdot listaan
-  List<String> generateFrequencyOptions() {
+  List<String> generateFrequencyOptions() {// luodaan notifikaatioiden tiheys vaihtoehdot listaan
     return List.generate(6, (index) => '${(index + 1) * 10}');
   }
 
@@ -109,12 +131,12 @@ class _InfoSivuState extends State<InfoSivu> {
                           ), child:
                         DropdownButtonFormField<String>(
                           value: selectedMorningTime,
-                          onChanged: (newValue) async {
-                            setState(() {
-                              selectedMorningTime = newValue!;
-                            });
-                            await SharedPreferencesHelper.setString('selectedMorningTime', selectedMorningTime);
-                          },
+                            onChanged: (newValue) async {
+                              if (newValue != null) {
+                                setState(() { selectedMorningTime = newValue; });
+                                await SharedPreferencesHelper.setString('selectedMorningTime', newValue);
+                              }
+                            },
                           items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -138,10 +160,10 @@ class _InfoSivuState extends State<InfoSivu> {
                     DropdownButtonFormField<String>( // illan notifikatioiden dropdown
                       value: selectedEveningTime,
                       onChanged: (newValue) async {
-                        setState(() {
-                          selectedEveningTime = newValue!;
-                        });
-                        await SharedPreferencesHelper.setString('selectedEveningTime', selectedEveningTime);
+                        if (newValue != null) {
+                          setState(() { selectedEveningTime = newValue; });
+                          await SharedPreferencesHelper.setString('selectedEveningTime', newValue);
+                        }
                       },
                       items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -165,10 +187,10 @@ class _InfoSivuState extends State<InfoSivu> {
                     DropdownButtonFormField<String>(// notificatioiden tiheys dropdown
                       value: selectedFrequency,
                       onChanged: (newValue) async {
-                        setState(() {
-                          selectedFrequency = newValue!;
-                        });
-                        await SharedPreferencesHelper.setString('selectedFrequency', selectedFrequency);
+                        if (newValue != null) {
+                          setState(() { selectedFrequency = newValue; });
+                          await SharedPreferencesHelper.setString('selectedFrequency', newValue);
+                        }
                       },
                       items: frequencyOptions.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -202,9 +224,9 @@ class _InfoSivuState extends State<InfoSivu> {
                                     value: notificationsEnabled,
                                     onChanged: (value) async {
                                       setState(() {
-                                        notificationsEnabled = value;
+                                        notificationsEnabled = value; 
                                       });
-                                      await SharedPreferencesHelper.setBool('notificationsEnabled', notificationsEnabled);
+                                      await SharedPreferencesHelper.setBool('notificationsEnabled', value);
                                     },
                                     activeColor: Turkoosi,
                                   ),
@@ -225,11 +247,11 @@ class _InfoSivuState extends State<InfoSivu> {
                                   ), child:
                               DropdownButtonFormField<String>( // päivittäisen resetoinnin aika
                                 value: dailyResetTime,
-                                onChanged: (newValue) async {
-                                  setState(() {
-                                    dailyResetTime = newValue!;
-                                  });
-                                 await SharedPreferencesHelper.setString('dailyResetTime', dailyResetTime);
+                                 onChanged: (newValue) async {
+                                  if (newValue != null) {
+                                    setState(() { dailyResetTime = newValue; });
+                                    await SharedPreferencesHelper.setString('dailyResetTime', newValue);
+                                  }
                                 },
                                 items: timeOptions.map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(

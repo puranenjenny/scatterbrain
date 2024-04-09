@@ -35,9 +35,8 @@ void main() async {
 
   await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
   scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
-  runApp(MyApp());
-  /* final int dailyResetId = 1;
-  await AndroidAlarmManager.periodic(const Duration(minutes: 1), dailyResetId, resetDailyTasks); */
+  runApp(MyApp()); // käynnistetään sovellus
+
 }
 
 // tehtävien resetointi
@@ -47,20 +46,50 @@ void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
 }
 
-void scheduleDailyReset() async { // aikataulutetaan päivittäinen resetointi klo 5 aamulla
+void scheduleDailyResetTesti() async { // aikataulutetaan päivittäinen resetointi klo 5 aamulla
   final int alarmId = 2; // uniikki ID hälytykselle
   final DateTime now = DateTime.now();
   final DateTime firstTime = DateTime(now.year, now.month, now.day, 5, 0, 0); 
-  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(minutes: 1)) : firstTime;
+  final DateTime scheduleTime2 = firstTime.isBefore(now) ? firstTime.add(Duration(minutes: 1)) : firstTime;
 
   await AndroidAlarmManager.periodic(
     const Duration(minutes: 1),
     alarmId, 
     resetDailyTasks,
-    startAt: scheduleTime,
+    startAt: scheduleTime2,
     exact: true,
     wakeup: true,
   );
+}
+
+void scheduleDailyReset() async {
+  final int alarmId = 3; // Uniikki ID hälytykselle
+  
+  String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime'); // haetaan aikataulu shared preferencesista
+  List<String> timeParts = dailyResetTime.split(':'); // pilkotaan aikataulu osiin tunti ja minuutti
+try {
+  int hour = int.parse(timeParts[0]);
+  int minute = int.parse(timeParts[1]);
+
+  final DateTime now = DateTime.now(); // haetaan nykyinen aika
+  final DateTime firstTime = DateTime(now.year, now.month, now.day, hour, minute, 0); // asetetaan aika ja siihen haluttu tunti ja minuutti
+  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime; // jos aika on jo mennyt, asetetaan seuraava päivä
+
+  await AndroidAlarmManager.periodic( // aikataulutettu resetointi periodisesti
+    Duration(days: 1), // suoritetaan kerran päivässä
+    alarmId, // uniikki ID
+    resetDailyTasks, // kutsutaan resetointi funktiota
+    startAt: scheduleTime, // aloitetaan aikataulu asetetusta ajasta
+    exact: true, // tarkka aikataulu
+    wakeup: true, // herätetään laite jos se on nukkumassa ja ajettaan taustalla
+  );
+} catch (e) {
+  // Käsittely virheelle, esimerkiksi asetetaan oletusaika tai logitetaan virhe
+  print('Error parsing daily reset time: $e');
+  return;
+}
+
+
 }
 
 // notificationit
