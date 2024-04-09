@@ -67,6 +67,7 @@ void scheduleDailyReset() async {
   
   String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime'); // haetaan aikataulu shared preferencesista
   List<String> timeParts = dailyResetTime.split(':'); // pilkotaan aikataulu osiin tunti ja minuutti
+  print(dailyResetTime);
 try {
   int hour = int.parse(timeParts[0]);
   int minute = int.parse(timeParts[1]);

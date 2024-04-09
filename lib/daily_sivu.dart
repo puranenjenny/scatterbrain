@@ -42,6 +42,7 @@ class _DailySivuState extends State<DailySivu> {
           SharedPreferencesHelper.setBool('allEveningDone', allEveningDone);
 
           _checkCompletedTasks();
+
         }
       );
     }

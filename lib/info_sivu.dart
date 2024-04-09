@@ -250,6 +250,7 @@ void _loadSelections() async {
                                  onChanged: (newValue) async {
                                   if (newValue != null) {
                                     setState(() { dailyResetTime = newValue; });
+                                    print("Scheduling daily reset at: $dailyResetTime");
                                     await SharedPreferencesHelper.setString('dailyResetTime', newValue);
                                   }
                                 },
