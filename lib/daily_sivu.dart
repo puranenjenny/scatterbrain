@@ -16,8 +16,8 @@ class _DailySivuState extends State<DailySivu> {
   List<Daily> _morningDailys = [];
   List<Daily> _eveningDailys = [];
 
-  bool morningMessageShown = false;
-  bool eveningMessageShown = false;
+/*   bool morningMessageShown = false;
+  bool eveningMessageShown = false; */
 
 
   @override
@@ -116,23 +116,23 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
     bool allMorningDone = _morningDailys.isNotEmpty && _morningDailys.every((task) => task.done);
     bool allEveningDone = _eveningDailys.isNotEmpty && _eveningDailys.every((task) => task.done);
 
-    if (allMorningDone && !allEveningDone && !morningMessageShown) {
-      Future.delayed(Duration.zero, () {
+    if (allMorningDone && !allEveningDone) {
+/*       Future.delayed(Duration.zero, () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Center(child: Text('Yay! You did all the morning things! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
           ),
         );
       });
-      morningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen
+      morningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen */
       return "images/tausta_aamu.png";
-    } else if (allMorningDone && allEveningDone && !eveningMessageShown) {
-      Future.delayed(Duration.zero, () {
+    } else if (allMorningDone && allEveningDone) {
+/*       Future.delayed(Duration.zero, () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Center(child: Text('Yay! All done! Time to rest! 😊', style: TextStyle(color: Sininen, fontSize: 17, fontFamily: 'FiraCode'))),
           ),
         );
       });
-      eveningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen
+      eveningMessageShown = true; // Päivittää lipun, jotta viestiä ei näytetä uudelleen */
       return "images/tausta_ilta.png";
     } else {
       return "images/tausta_alku.png";
