@@ -40,6 +40,9 @@ void main() async {
 
   await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
 
+  tz.initializeTimeZones(); //alustetaan timezone
+  var helsinki = tz.getLocation('Europe/Helsinki'); //ja asetetaan se helsinkiin
+  tz.setLocalLocation(helsinki);
 
   bool notificationsEnabled = SharedPreferencesHelper.getBool('notificationsEnabled'); // varmistetaan että ilmoitukset käynnistyvät käyttäjän määrittelemien asetusten mukaisesti
   if (notificationsEnabled) {
@@ -48,19 +51,16 @@ void main() async {
     print("notifikaatiot on päällä: $notificationsEnabled" );
   }
 
-  tz.initializeTimeZones(); //alustetaan timezone
-  var helsinki = tz.getLocation('Europe/Helsinki'); //ja asetetaan se helsinkiin
-  tz.setLocalLocation(helsinki);
-
   scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
   runApp(MyApp()); // käynnistetään sovellus
 
 }
 
+
 //timeri
 void printCurrentTime() {
-  final DateTime now = DateTime.now();
-  print("Current time: $now");
+  final now = tz.TZDateTime.now(tz.local);
+  print("Current time in Helsinki: $now");
 }
 
 // tehtävien resetointi
@@ -68,6 +68,8 @@ void printCurrentTime() {
 @pragma('vm:entry-point') // hattu joka pakottaa funktion suoritettavaksi myös taustalla
 void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
+  await NotificationApi.cancelMorningNotifications();
+  await NotificationApi.cancelEveningNotifications();
   await SharedPreferencesHelper.setBool('morningMessageShown', false);
   await SharedPreferencesHelper.setBool('eveningMessageShown', false);
 }

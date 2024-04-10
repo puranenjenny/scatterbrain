@@ -31,7 +31,7 @@ class NotificationApi {
         'Scatterbrain',
         channelDescription: 'channel description',
         importance: Importance.max, // korkein prioriteetti
-
+        icon: '@mipmap/ic_stat_paw'
       ),
       iOS: DarwinNotificationDetails(),
     );
@@ -54,7 +54,7 @@ class NotificationApi {
 
   //aamuhälytykset
   static Future<void> scheduleMorningNotifications() async {
-    String morningTime = "14:20";//await SharedPreferencesHelper.getString('selectedMorningTime');
+    String morningTime = "12:25";//await SharedPreferencesHelper.getString('selectedMorningTime');
     String frequency =  "1"; //await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
     bool morningMessageShown = await SharedPreferencesHelper.getBool('morningMessageShown');
@@ -78,8 +78,7 @@ class NotificationApi {
     int minute = int.parse(timeParts[1]);
     int notificationFrequency = int.parse(frequency);
 
-    var helsinki = tz.getLocation('Europe/Helsinki'); //asetetaan aika helsinkiin
-    final now = tz.TZDateTime.now(helsinki);
+    final now = tz.TZDateTime.now(tz.local);
     print(now);
     var morningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
     print(morningDateTime);
@@ -88,7 +87,7 @@ class NotificationApi {
       morningDateTime = morningDateTime.add(Duration(days: 1));
     }
 
-    int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 25
+    int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 10:een
 
     for (int i = 0; i < maxNotifications; i++) {
       print("loopin sisällä");
