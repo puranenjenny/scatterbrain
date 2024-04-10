@@ -2,13 +2,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:scatter_brain/notifications/shared_helper.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../database/database_helper.dart';
 
-class Time {
-  final int hour;
-  final int minute;
-
-  Time(this.hour, this.minute);
-}
 
 class NotificationApi {
   static final _notifications = FlutterLocalNotificationsPlugin();
@@ -26,6 +21,7 @@ class NotificationApi {
     );
     tz.initializeTimeZones();
     await _notifications.initialize(initializationSettings);
+
   }
 
   static Future _notificationDetails() async { //tarvii
@@ -55,49 +51,44 @@ class NotificationApi {
         payload: payload,
       );
 
-  //Vaihtoehto1:Ilmoitus5sekunninkuluttua
-  static show5SecondsNotification({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
-    required tz.TZDateTime scheduledDate,
-  })async=>
-      _notifications.zonedSchedule(
-        id,
-        title,
-        body,
-        scheduledDate,
-        await _notificationDetails(),
-        payload:payload,
-        androidScheduleMode:AndroidScheduleMode.exact,
-        uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents:DateTimeComponents.time,
-      );
 
   //aamuhälytykset
   static Future<void> scheduleMorningNotifications() async {
-    String morningTime = "12:11";//await SharedPreferencesHelper.getString('selectedMorningTime');
+    String morningTime = "14:20";//await SharedPreferencesHelper.getString('selectedMorningTime');
     String frequency =  "1"; //await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
+    bool morningMessageShown = await SharedPreferencesHelper.getBool('morningMessageShown');
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
 
-    if (!notificationsEnabled) return;
+    if (!notificationsEnabled || morningMessageShown) return;
+
+    final dailys = await DatabaseHelper.getDailyTasks(); //tarkistetaan onko aamutehtäviä
+    if (dailys == null) { //jos ei ole dailyja ollenkaan
+      print("No tasks in database.");
+      return;
+    }
+    final morningDailys = dailys.where((daily) => daily.timeOfDay == 'Morning').toList(); //laitetaan listaan
+    if (morningDailys.isEmpty) { //jos lista on tyhjä
+      print("No morning tasks, so no notifications.");
+      return; //jos ei ole palataan takaisin
+    }
 
     List<String> timeParts = morningTime.split(':');
     int hour = int.parse(timeParts[0]);
     int minute = int.parse(timeParts[1]);
     int notificationFrequency = int.parse(frequency);
 
-    final now = tz.TZDateTime.now(tz.local);
+    var helsinki = tz.getLocation('Europe/Helsinki'); //asetetaan aika helsinkiin
+    final now = tz.TZDateTime.now(helsinki);
+    print(now);
     var morningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    print(morningDateTime);
 
     if (now.isAfter(morningDateTime)) { // tarkistetaan onko valittu kellonaika jo mennyt, jos on ajoitetaan huomiselle
       morningDateTime = morningDateTime.add(Duration(days: 1));
     }
 
-    int maxNotifications = 10;// rajoitetaan ilmoitusten määrä korkeintaan 10:een
+    int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 25
 
     for (int i = 0; i < maxNotifications; i++) {
       print("loopin sisällä");
@@ -116,14 +107,25 @@ class NotificationApi {
 
 
   //iltahälytykset
-  @pragma('vm:entry-point')
   static Future<void> scheduleEveningNotifications() async {
     String eveningTime = await SharedPreferencesHelper.getString('selectedEveningTime');
     String frequency = await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
+    bool eveningMessageShown = await SharedPreferencesHelper.getBool('eveningMessageShown');
     print('Scheduling evening notifications at $eveningTime with frequency $frequency');
 
-    if (!notificationsEnabled) return;
+    if (!notificationsEnabled || eveningMessageShown) return;
+
+    final dailys = await DatabaseHelper.getDailyTasks(); //tarkistetaan onko iltatehtäviä
+    if (dailys == null) { //jos ei ole dailyja ollenkaan
+      print("No tasks in database.");
+      return;
+    }
+    final eveningDailys = dailys.where((daily) => daily.timeOfDay == 'Evening').toList(); //laitetaan listaan
+    if (eveningDailys.isEmpty) {
+      print("No evening tasks, so no notifications.");
+      return;
+    }
 
     List<String> timeParts = eveningTime.split(':');
     int hour = int.parse(timeParts[0]);
@@ -137,7 +139,7 @@ class NotificationApi {
       eveningDateTime = eveningDateTime.add(Duration(days: 1));
     }
 
-    int maxNotifications = 10;
+    int maxNotifications = 25;
 
     for (int i = 0; i < maxNotifications; i++) {
       _notifications.zonedSchedule(
@@ -153,26 +155,19 @@ class NotificationApi {
     }
   }
 
-
-  static Future<void> cancelMorningNotifications() async {
-    // Tässä esimerkissä oletetaan, että aamun ilmoitusten ID:t alkavat 1000:sta.
-    // Peruutetaan kaikki aamun ilmoitukset.
-    for (int i = 1000; i < 2000; i++) {
+  static Future<void>cancelMorningNotifications()async{
+    for(int i=1000;i<2000;i++){
       await _notifications.cancel(i);
     }
-    print("Morning notifications cancelled.");
+    print("Morningnotificationscancelled.");
   }
 
-  static Future<void> cancelEveningNotifications() async {
-    // Tässä esimerkissä oletetaan, että illan ilmoitusten ID:t alkavat 2000:sta.
-    // Peruutetaan kaikki illan ilmoitukset.
-    for (int i = 2000; i < 3000; i++) {
+  static Future<void>cancelEveningNotifications()async{
+    for(int i=2000;i<3000;i++){
       await _notifications.cancel(i);
     }
-    print("Evening notifications cancelled.");
+    print("Eveningnotificationscancelled.");
   }
-
-
 
 }
 

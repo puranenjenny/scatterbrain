@@ -1,16 +1,17 @@
-import 'dart:async';
-
+import 'dart:async'; //testaustimeri
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'package:scatter_brain/notifications/shared_helper.dart';
-import 'daily_sivu.dart';
+import 'daily_sivu.dart'; //sivut
 import 'todo_sivu.dart';
 import 'info_sivu.dart';
 import 'constants/colors.dart'; // värit
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -47,6 +48,10 @@ void main() async {
     print("notifikaatiot on päällä: $notificationsEnabled" );
   }
 
+  tz.initializeTimeZones(); //alustetaan timezone
+  var helsinki = tz.getLocation('Europe/Helsinki'); //ja asetetaan se helsinkiin
+  tz.setLocalLocation(helsinki);
+
   scheduleDailyReset(); // kutsutaan päivittäinen resetointi funktiota
   runApp(MyApp()); // käynnistetään sovellus
 
@@ -63,8 +68,8 @@ void printCurrentTime() {
 @pragma('vm:entry-point') // hattu joka pakottaa funktion suoritettavaksi myös taustalla
 void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
-  await NotificationApi.scheduleMorningNotifications(); // käynnistetään myös notificationit uudestaan
-  await NotificationApi.scheduleEveningNotifications();
+  await SharedPreferencesHelper.setBool('morningMessageShown', false);
+  await SharedPreferencesHelper.setBool('eveningMessageShown', false);
 }
 
 @pragma('vm:entry-point')

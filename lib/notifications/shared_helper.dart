@@ -21,6 +21,7 @@ class SharedPreferencesHelper {
     if (!_prefs!.containsKey('notificationsEnabled')) {
       await _prefs!.setBool('notificationsEnabled', true);
     }
+
   }
 
   static Future<bool> setBool(String key, bool value) async {

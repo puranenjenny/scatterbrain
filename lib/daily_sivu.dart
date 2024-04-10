@@ -224,25 +224,6 @@ return Scaffold(
                   _buildTaskList(_morningDailys, "Morning Tasks"),
                   _buildTaskList(_eveningDailys, "Evening Tasks"),
                 _buildButton(
-                  title: 'Show Notification',
-                  icon: Icon(Icons.notifications), // Use an icon widget directly
-                  onPressed: () async {
-                    await NotificationApi.showNotification(
-                      title: 'Reminder',
-                      body: 'You have unfinished tasks!',
-                      payload: 'payload', // payload tarkoittaa tietoa joka voidaan lähettää notifikaation mukana, optional
-                    );
-                  },
-                ),
-                _buildButton(
-                  title: 'Show Notification in 5 seconds (Scheduled)',
-                  icon: Icon(Icons.notifications),
-                  onPressed: () async {
-                    final tz.TZDateTime scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
-                    await NotificationApi.show5SecondsNotification(id: 0, scheduledDate: scheduledDate);
-                  },
-                ),
-                _buildButton(
                   title: 'Reset Daily Tasks',
                   icon: Icon(Icons.refresh),
                   onPressed: () async {

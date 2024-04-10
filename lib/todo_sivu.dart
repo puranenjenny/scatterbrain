@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:scatter_brain/database/daily_model.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'package:scatter_brain/database/task_model.dart'; 
-import 'package:scatter_brain/constants/colors.dart'; 
+import 'package:scatter_brain/constants/colors.dart';
+import 'package:scatter_brain/notifications/notification_helper.dart';
 
 class ToDoSivu extends StatefulWidget {
   const ToDoSivu({Key? key}) : super(key: key);
@@ -163,6 +164,8 @@ String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
                     timeOfDay: _selectedTimeOfDay, 
                   );
                   DatabaseHelper.addDailyTask(newDaily);
+                  NotificationApi.scheduleEveningNotifications();
+                  NotificationApi.scheduleMorningNotifications();
                   _dailyTextFieldController.clear();
                   Navigator.of(context).pop();
                 }
