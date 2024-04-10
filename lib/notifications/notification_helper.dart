@@ -35,6 +35,7 @@ class NotificationApi {
         'Scatterbrain',
         channelDescription: 'channel description',
         importance: Importance.max, // korkein prioriteetti
+
       ),
       iOS: DarwinNotificationDetails(),
     );
@@ -75,9 +76,10 @@ class NotificationApi {
         matchDateTimeComponents:DateTimeComponents.time,
       );
 
+  //aamuhälytykset
   static Future<void> scheduleMorningNotifications() async {
-    String morningTime = await SharedPreferencesHelper.getString('selectedMorningTime');
-    String frequency = await SharedPreferencesHelper.getString('selectedFrequency');
+    String morningTime = "12:11";//await SharedPreferencesHelper.getString('selectedMorningTime');
+    String frequency =  "1"; //await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
 
@@ -89,12 +91,19 @@ class NotificationApi {
     int notificationFrequency = int.parse(frequency);
 
     final now = tz.TZDateTime.now(tz.local);
-    final morningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var morningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
 
-    for (int i = 0; morningDateTime.add(Duration(minutes: i * notificationFrequency)).isBefore(morningDateTime.add(Duration(hours: 12))); i++) {
+    if (now.isAfter(morningDateTime)) { // tarkistetaan onko valittu kellonaika jo mennyt, jos on ajoitetaan huomiselle
+      morningDateTime = morningDateTime.add(Duration(days: 1));
+    }
+
+    int maxNotifications = 10;// rajoitetaan ilmoitusten määrä korkeintaan 10:een
+
+    for (int i = 0; i < maxNotifications; i++) {
+      print("loopin sisällä");
       _notifications.zonedSchedule(
-        1000 + i,  // ainutlaatuinen ID jokaiselle ilmoitukselle
-        "Hello there! 😊 ",
+        1000 + i, // Ainutlaatuinen ID jokaiselle ilmoitukselle
+        "Hello there! 😊",
         "You have unfinished morning tasks! Do not sink in too deep before completing them!",
         morningDateTime.add(Duration(minutes: i * notificationFrequency)),
         await _notificationDetails(),
@@ -105,6 +114,9 @@ class NotificationApi {
     }
   }
 
+
+  //iltahälytykset
+  @pragma('vm:entry-point')
   static Future<void> scheduleEveningNotifications() async {
     String eveningTime = await SharedPreferencesHelper.getString('selectedEveningTime');
     String frequency = await SharedPreferencesHelper.getString('selectedFrequency');
@@ -119,11 +131,17 @@ class NotificationApi {
     int notificationFrequency = int.parse(frequency);
 
     final now = tz.TZDateTime.now(tz.local);
-    final eveningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var eveningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
 
-    for (int i = 0; eveningDateTime.add(Duration(minutes: i * notificationFrequency)).isBefore(eveningDateTime.add(Duration(hours: 12))); i++) {
+    if (now.isAfter(eveningDateTime)) {
+      eveningDateTime = eveningDateTime.add(Duration(days: 1));
+    }
+
+    int maxNotifications = 10;
+
+    for (int i = 0; i < maxNotifications; i++) {
       _notifications.zonedSchedule(
-        1000 + i,  // ainutlaatuinen ID jokaiselle ilmoitukselle
+        2000 + i,
         "Good evening! 😊 ",
         "You have unfinished tasks! Try to get them done so you can relax!",
         eveningDateTime.add(Duration(minutes: i * notificationFrequency)),
@@ -135,29 +153,23 @@ class NotificationApi {
     }
   }
 
-  // Apumetodit
-  static Future showAjastettuNotification({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
-    required tz.TZDateTime scheduledDate,
-    DateTimeComponents matchDateTimeComponents = DateTimeComponents.time,
-  }) async =>
-      _notifications.zonedSchedule(
-        id,
-        title,
-        body,
-        scheduledDate,
-        await _notificationDetails(),
-        payload: payload,
-        androidScheduleMode: AndroidScheduleMode.exact,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: matchDateTimeComponents,
-      );
 
-  static void cancelAll() {
+  static Future<void> cancelMorningNotifications() async {
+    // Tässä esimerkissä oletetaan, että aamun ilmoitusten ID:t alkavat 1000:sta.
+    // Peruutetaan kaikki aamun ilmoitukset.
+    for (int i = 1000; i < 2000; i++) {
+      await _notifications.cancel(i);
+    }
+    print("Morning notifications cancelled.");
+  }
 
+  static Future<void> cancelEveningNotifications() async {
+    // Tässä esimerkissä oletetaan, että illan ilmoitusten ID:t alkavat 2000:sta.
+    // Peruutetaan kaikki illan ilmoitukset.
+    for (int i = 2000; i < 3000; i++) {
+      await _notifications.cancel(i);
+    }
+    print("Evening notifications cancelled.");
   }
 
 

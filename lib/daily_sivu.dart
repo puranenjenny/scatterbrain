@@ -42,7 +42,6 @@ class _DailySivuState extends State<DailySivu> {
           SharedPreferencesHelper.setBool('allEveningDone', allEveningDone);
 
           _checkCompletedTasks();
-
         }
       );
     }
@@ -152,7 +151,8 @@ Future<bool> _checkCompletedTasks() async {
           ),
         );
       });
-      await SharedPreferencesHelper.setBool('morningMessageShown', true); // tallennetaan että aamuviesti on näytetty 
+      await SharedPreferencesHelper.setBool('morningMessageShown', true); // tallennetaan että aamuviesti on näytetty
+      await NotificationApi.cancelMorningNotifications();
 
     } else if (allMorningDone && allEveningDone && !eveningMessageShown) { // jos kaikki tehtävät on tehty
       WidgetsBinding.instance.addPostFrameCallback((_) { // näytetään snackbar
@@ -162,10 +162,11 @@ Future<bool> _checkCompletedTasks() async {
         );
       });
       await SharedPreferencesHelper.setBool('eveningMessageShown', true); // tallennetaan että iltaviesti on näytetty
+      await NotificationApi.cancelEveningNotifications();
+
     }
     return false; // palautetaan false
 }
-    
 
 
  @override

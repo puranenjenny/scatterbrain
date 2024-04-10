@@ -54,7 +54,7 @@ void _loadSelections() async {
   }
 
   List<String> generateFrequencyOptions() {// luodaan notifikaatioiden tiheys vaihtoehdot listaan
-    return List.generate(6, (index) => '${(index + 1) * 10}');
+    return List.generate(12, (index) => '${(index + 1) * 5}');
   }
 
   @override
@@ -293,6 +293,7 @@ void _loadSelections() async {
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
                     Center(child: Text('We hope Scatterbrain helps you keep track of your daily tasks and makes your life a little bit easier. ✨', style: TextStyle(color: Sininen, fontSize: 20, fontFamily: 'FiraCode'))),
                     SizedBox(height: 20),
                   ],
