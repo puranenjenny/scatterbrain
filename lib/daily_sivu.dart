@@ -184,11 +184,11 @@ return Scaffold(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Daily Tasks', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
-                SizedBox(width: 30), 
-                Image.asset('images/daily.png', width: 50, height: 50,)
+                Text('Daily', style: TextStyle(color: Sininen, fontSize: 40, fontFamily: 'GochiHand')),
+                SizedBox(width: 20),
+                Image.asset('images/daily.png', width: 40, height: 40,)
               ],
             ),
             Padding(
@@ -223,6 +223,7 @@ return Scaffold(
                 children: [
                   _buildTaskList(_morningDailys, "Morning Tasks"),
                   _buildTaskList(_eveningDailys, "Evening Tasks"),
+                  SizedBox(height: 200),
                 _buildButton(
                   title: 'Reset Daily Tasks',
                   icon: Icon(Icons.refresh),

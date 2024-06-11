@@ -59,8 +59,8 @@ void main() async {
 
 //timeri
 void printCurrentTime() {
-  final now = tz.TZDateTime.now(tz.local);
-  print("Current time in Helsinki: $now");
+  print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
+
 }
 
 // tehtävien resetointi
@@ -88,6 +88,7 @@ try {
   int minute = int.parse(timeParts[1]);
 
   final DateTime now = DateTime.now(); // haetaan nykyinen aika
+  print("Dailyresetissä kello on nyt: $now");
   final DateTime firstTime = DateTime(now.year, now.month, now.day, hour, minute, 0); // asetetaan aika ja siihen haluttu tunti ja minuutti
   final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime; // jos aika on jo mennyt, asetetaan seuraava päivä
 

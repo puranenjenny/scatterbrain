@@ -222,7 +222,7 @@ String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
         toolbarHeight: 88,
         title: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
-          child: Text('Todo List', style: TextStyle(color: Sininen, fontSize: 50, fontFamily: 'GochiHand')),
+          child: Text('Todo', style: TextStyle(color: Sininen, fontSize: 40, fontFamily: 'GochiHand')),
         ),
         actions: <Widget>[
           IconButton(

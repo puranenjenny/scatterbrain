@@ -10,6 +10,8 @@ class NotificationApi {
 
   static Future<void> init() async {
     tz.initializeTimeZones();
+    var helsinki = tz.getLocation('Europe/Helsinki');
+    tz.setLocalLocation(helsinki);
 
     final AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -54,11 +56,16 @@ class NotificationApi {
 
   //aamuhälytykset
   static Future<void> scheduleMorningNotifications() async {
-    String morningTime = "12:25";//await SharedPreferencesHelper.getString('selectedMorningTime');
+    var helsinki = tz.getLocation('Europe/Helsinki');
+    final now = tz.TZDateTime.now(helsinki);
+    String morningTime = "16:35";//await SharedPreferencesHelper.getString('selectedMorningTime');
     String frequency =  "1"; //await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
     bool morningMessageShown = await SharedPreferencesHelper.getBool('morningMessageShown');
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
+    print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
+
+
 
     if (!notificationsEnabled || morningMessageShown) return;
 
@@ -78,16 +85,15 @@ class NotificationApi {
     int minute = int.parse(timeParts[1]);
     int notificationFrequency = int.parse(frequency);
 
-    final now = tz.TZDateTime.now(tz.local);
-    print(now);
-    var morningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    print( "Local time: $now");
+    var morningDateTime = tz.TZDateTime(helsinki, now.year, now.month, now.day, hour, minute);
     print(morningDateTime);
 
     if (now.isAfter(morningDateTime)) { // tarkistetaan onko valittu kellonaika jo mennyt, jos on ajoitetaan huomiselle
       morningDateTime = morningDateTime.add(Duration(days: 1));
     }
 
-    int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 10:een
+    int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 25:een
 
     for (int i = 0; i < maxNotifications; i++) {
       print("loopin sisällä");
@@ -131,8 +137,9 @@ class NotificationApi {
     int minute = int.parse(timeParts[1]);
     int notificationFrequency = int.parse(frequency);
 
-    final now = tz.TZDateTime.now(tz.local);
-    var eveningDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var helsinki = tz.getLocation('Europe/Helsinki');
+    final now = tz.TZDateTime.now(helsinki);
+    var eveningDateTime = tz.TZDateTime(helsinki, now.year, now.month, now.day, hour, minute);
 
     if (now.isAfter(eveningDateTime)) {
       eveningDateTime = eveningDateTime.add(Duration(days: 1));
