@@ -51,7 +51,7 @@ class _InfoSivuState extends State<InfoSivu> {
     // luopdaan aamu ja iltapäivä notifikaatioiden aika vaihtoehdot listaan puolen tunnin välein
     List<String> times = [];
     for (int hour = 0; hour < 24; hour++) {
-      for (int minute = 0; minute < 60; minute += 30) {
+      for (int minute = 0; minute < 60; minute += 5) { //muuta takas 5->30!!!!!!!!!!!!!
         String timeString =
             '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
         times.add(timeString);
@@ -59,6 +59,7 @@ class _InfoSivuState extends State<InfoSivu> {
     }
     return times;
   }
+
 
   List<String> generateFrequencyOptions() { //luodaan notificaatioiden tiheys lista 1-60min
     List<String> frequencyOptions = ['1', '2', '3', '4'];
