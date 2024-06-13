@@ -58,8 +58,8 @@ class NotificationApi {
   static Future<void> scheduleMorningNotifications() async {
     var helsinki = tz.getLocation('Europe/Helsinki');
     final now = tz.TZDateTime.now(helsinki);
-    String morningTime = "16:35";//await SharedPreferencesHelper.getString('selectedMorningTime');
-    String frequency =  "1"; //await SharedPreferencesHelper.getString('selectedFrequency');
+    String morningTime = await SharedPreferencesHelper.getString('selectedMorningTime');
+    String frequency = await SharedPreferencesHelper.getString('selectedFrequency');
     bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
     bool morningMessageShown = await SharedPreferencesHelper.getBool('morningMessageShown');
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
@@ -96,7 +96,7 @@ class NotificationApi {
     int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 25:een
 
     for (int i = 0; i < maxNotifications; i++) {
-      print("loopin sisällä");
+      print("aamuhälytysloopin sisällä");
       _notifications.zonedSchedule(
         1000 + i, // Ainutlaatuinen ID jokaiselle ilmoitukselle
         "Hello there! 😊",

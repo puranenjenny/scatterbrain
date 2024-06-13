@@ -65,7 +65,7 @@ void printCurrentTime() {
 
 // tehtävien resetointi
 
-@pragma('vm:entry-point') // hattu joka pakottaa funktion suoritettavaksi myös taustalla
+@pragma('vm:entry-point') // hattu joka sallii funktion suoritettavaksi myös taustalla
 void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
   await NotificationApi.cancelMorningNotifications();
@@ -116,16 +116,6 @@ Future<void> _showNotification() async {
   var generalNotificationDetails = NotificationDetails(android: androidDetails);
   await flutterLocalNotificationsPlugin.show(3, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
 }
-
-
-/* void scheduleMorningTasks() {
-  final morningStart = DateTime.now().add(Duration(days: 1)).subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute)); // Seuraavan päivän klo 00:00
-  final morningEnd = morningStart.add(Duration(hours: 13)); // Seuraavan päivän klo 13:00
-  for (DateTime time = morningStart.add(Duration(hours: 10)); time.isBefore(morningEnd); time = time.add(Duration(minutes: 10))) {
-    int alarmId = 1;
-    AndroidAlarmManager.oneShotAt(time, alarmId, checkAndNotifyTasks, exact: true, wakeup: true);
-  }
-} */
 
 
  void checkAndNotifyTasks() async {  // tarkistetaan että tehtävät on tehny, palauttaa 'true'

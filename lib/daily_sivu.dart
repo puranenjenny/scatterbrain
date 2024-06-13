@@ -6,7 +6,6 @@ import 'package:scatter_brain/database/daily_model.dart';
 import 'package:scatter_brain/database/database_helper.dart';
 import 'package:scatter_brain/notifications/shared_helper.dart'; 
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 class DailySivu extends StatefulWidget {
   @override
