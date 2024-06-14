@@ -46,7 +46,7 @@ void main() async {
 
   bool notificationsEnabled = SharedPreferencesHelper.getBool('notificationsEnabled'); // varmistetaan että ilmoitukset käynnistyvät käyttäjän määrittelemien asetusten mukaisesti
   if (notificationsEnabled) {
-    NotificationApi.scheduleMorningNotifications();
+    NotificationApi.scheduleMorningNotifications(); //notification_helperin luokka
     NotificationApi.scheduleEveningNotifications();
     print("notifikaatiot on päällä: $notificationsEnabled" );
   }
@@ -57,7 +57,7 @@ void main() async {
 }
 
 
-//timeri
+//timeri testaukseen (koska käytin liian monta tuntia vianselvitykseen kun emulaattorissa olikin väärä aika :) )
 void printCurrentTime() {
   print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
 

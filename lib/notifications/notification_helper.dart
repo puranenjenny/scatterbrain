@@ -67,8 +67,6 @@ class NotificationApi {
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
     print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
 
-
-
     if (!notificationsEnabled || morningMessageShown) return;
 
     final dailys = await DatabaseHelper.getDailyTasks(); //tarkistetaan onko aamutehtäviä
