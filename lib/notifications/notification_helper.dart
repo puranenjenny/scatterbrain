@@ -29,12 +29,12 @@ class NotificationApi {
   static Future _notificationDetails() async { //tarvii
     return NotificationDetails(
       android: AndroidNotificationDetails(
-        'channel id6',
+        'channel id7',
         'Scatterbrain',
         channelDescription: 'channel description',
         importance: Importance.max, // korkein prioriteetti
-        icon: '@mipmap/ic_stat_paw',
-        sound: RawResourceAndroidNotificationSound('catmeow2'),
+        icon: '@mipmap/ic_stat_paw', //iconi
+        sound: RawResourceAndroidNotificationSound('sparkle'), //custom ääni
         //playSound: false,
       ),
       iOS: DarwinNotificationDetails(),
