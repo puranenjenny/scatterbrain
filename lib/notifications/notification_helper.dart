@@ -29,13 +29,11 @@ class NotificationApi {
   static Future _notificationDetails() async { //tarvii
     return NotificationDetails(
       android: AndroidNotificationDetails(
-        'channel id6',
+        'channel id',
         'Scatterbrain',
         channelDescription: 'channel description',
         importance: Importance.max, // korkein prioriteetti
-        icon: '@mipmap/ic_stat_paw',
-        sound: RawResourceAndroidNotificationSound('catmeow2'),
-        //playSound: false,
+        icon: '@mipmap/ic_stat_paw'
       ),
       iOS: DarwinNotificationDetails(),
     );
@@ -93,14 +91,14 @@ class NotificationApi {
 
     if (now.isAfter(morningDateTime)) { // tarkistetaan onko valittu kellonaika jo mennyt, jos on ajoitetaan huomiselle
       morningDateTime = morningDateTime.add(Duration(days: 1));
-      print("Notificationit alkaa HUOMENNA!");
     }
 
     int maxNotifications = 25;// rajoitetaan ilmoitusten määrä korkeintaan 25:een
 
     for (int i = 0; i < maxNotifications; i++) {
+      print("aamuhälytysloopin sisällä");
       _notifications.zonedSchedule(
-        1000 + i, // ainutlaatuinen ID jokaiselle ilmoitukselle
+        1000 + i, // Ainutlaatuinen ID jokaiselle ilmoitukselle
         "Hello there! 😊",
         "You have unfinished morning tasks! Do not sink in too deep before completing them!",
         morningDateTime.add(Duration(minutes: i * notificationFrequency)),
