@@ -33,7 +33,8 @@ class NotificationApi {
         'Scatterbrain',
         channelDescription: 'channel description',
         importance: Importance.max, // korkein prioriteetti
-        icon: '@mipmap/ic_stat_paw'
+        icon: '@mipmap/ic_stat_paw',
+        sound: RawResourceAndroidNotificationSound('sparkle'),
       ),
       iOS: DarwinNotificationDetails(),
     );

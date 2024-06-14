@@ -76,37 +76,33 @@ void resetDailyTasks() async { // resetoi päivittäiset tehtävät
 
 @pragma('vm:entry-point')
 void scheduleDailyReset() async {
-  final int alarmId = 3; // uniikki ID hälytykselle
-  
-  String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime'); // haetaan aikataulu shared preferencesista
-  print(dailyResetTime);
-  List<String> timeParts = dailyResetTime.split(':'); // pilkotaan aikataulu osiin tunti ja minuutti
-  print(timeParts);
+  final int alarmId = 3; // Unique ID for the alarm
 
-try {
-  int hour = int.parse(timeParts[0]);
-  int minute = int.parse(timeParts[1]);
+  String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime');
+  List<String> timeParts = dailyResetTime.split(':');
+  try {
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
 
-  final DateTime now = DateTime.now(); // haetaan nykyinen aika
-  print("Dailyresetissä kello on nyt: $now");
-  final DateTime firstTime = DateTime(now.year, now.month, now.day, hour, minute, 0); // asetetaan aika ja siihen haluttu tunti ja minuutti
-  final DateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(Duration(days: 1)) : firstTime; // jos aika on jo mennyt, asetetaan seuraava päivä
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'));
+    final tz.TZDateTime firstTime = tz.TZDateTime(now.location, now.year, now.month, now.day, hour, minute);
+    final tz.TZDateTime scheduleTime = firstTime.isBefore(now) ? firstTime.add(const Duration(days: 1)) : firstTime;
 
-  print(now);
-  await AndroidAlarmManager.periodic( // aikataulutettu resetointi periodisesti
-    Duration(days: 1), // suoritetaan kerran päivässä
-    alarmId, // uniikki ID
-    resetDailyTasks, // kutsutaan resetointi funktiota
-    startAt: scheduleTime, // aloitetaan aikataulu asetetusta ajasta
-    exact: true, // tarkka aikataulu
-    wakeup: true, // herätetään laite jos se on nukkumassa ja ajettaan taustalla
-  );
-} catch (e) {
-  print('Error parsing daily reset time: $e');
-  return;
+    print("Scheduling daily reset at: $scheduleTime");
+
+    await AndroidAlarmManager.periodic(
+        const Duration(days: 1), // Executes once a day
+        alarmId, // Unique ID
+        resetDailyTasks, // Function to call
+        startAt: scheduleTime,
+        exact: true,
+        wakeup: true
+    );
+  } catch (e) {
+    print('Error setting daily reset time: $e');
+  }
 }
 
-}
 
 
 // notificationit

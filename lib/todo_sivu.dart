@@ -26,14 +26,14 @@ class _ToDoSivuState extends State<ToDoSivu> {
 void _loadTodos() async {
   final tasks = await DatabaseHelper.getTasks();
   if (tasks != null) {
-    // Järjestä tehtävät niin, että tekemättömät (done == false) tulevat ensin
+    // järjestä tehtävät niin, että tekemättömät (done == false) tulevat ensin
     tasks.sort((a, b) {
       if (a.done == b.done) {
-        return 0; // Älä muuta järjestystä, jos molemmat ovat samassa tilassa
+        return 0; // älä muuta järjestystä, jos molemmat ovat samassa tilassa
       } else if (a.done && !b.done) {
-        return 1; // Siirrä tehtyjä tehtäviä listan loppuun
+        return 1; // siirrä tehdyt listan loppuun
       } else {
-        return -1; // Pidä tekemättömät tehtävät listan alussa
+        return -1; // tekemättömät tehtävät pysyy listan alussa
       }
     });
 

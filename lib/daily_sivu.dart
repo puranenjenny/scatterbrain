@@ -228,6 +228,8 @@ return Scaffold(
                   icon: Icon(Icons.refresh),
                   onPressed: () async {
                     await DatabaseHelper.resetAllDailysToNotDone();
+                    await SharedPreferencesHelper.setBool('morningMessageShown', false);
+                    await SharedPreferencesHelper.setBool('eveningMessageShown', false);
                     _loadDailys();
                   },
                 ),

@@ -51,7 +51,7 @@ class _InfoSivuState extends State<InfoSivu> {
     // luopdaan aamu ja iltapäivä notifikaatioiden aika vaihtoehdot listaan puolen tunnin välein
     List<String> times = [];
     for (int hour = 0; hour < 24; hour++) {
-      for (int minute = 0; minute < 60; minute += 30) {
+      for (int minute = 0; minute < 60; minute += 5) { //muuta takas 5-30 !!!!
         String timeString =
             '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
         times.add(timeString);
@@ -77,7 +77,7 @@ class _InfoSivuState extends State<InfoSivu> {
       backgroundColor: Tausta,
       appBar: AppBar(
           backgroundColor: Tausta,
-          toolbarHeight: 98,
+          toolbarHeight: 88,
           title: Padding(
             padding:
                 const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
@@ -112,7 +112,7 @@ class _InfoSivuState extends State<InfoSivu> {
                               'This app is designed for all of us scatterbrains to stay on top of our morning and evening routines, as well as everyday errands. ',
                               style: TextStyle(
                                   color: Sininen,
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontFamily: 'FiraCode')),
                         )),
                     ExpansionTile(
@@ -417,7 +417,7 @@ class _InfoSivuState extends State<InfoSivu> {
                             'We hope Scatterbrain helps you keep track of your daily tasks and makes your life a little bit easier. ✨',
                             style: TextStyle(
                                 color: Sininen,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontFamily: 'FiraCode'))),
                     SizedBox(height: 20),
                   ],
