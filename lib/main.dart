@@ -1,4 +1,4 @@
-import 'dart:async'; //testaustimeri
+import 'dart:async';
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
@@ -13,9 +13,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // varmistetaan, että widgetit on alustettu
@@ -45,7 +43,7 @@ void main() async {
   tz.setLocalLocation(helsinki);
 
   bool notificationsEnabled = SharedPreferencesHelper.getBool('notificationsEnabled'); // varmistetaan että ilmoitukset käynnistyvät käyttäjän määrittelemien asetusten mukaisesti
-  if (notificationsEnabled) {
+  if (notificationsEnabled) { //jos notificaatiot on päällä, kutsutaan aamu ja ilta notificationeja
     NotificationApi.scheduleMorningNotifications();
     NotificationApi.scheduleEveningNotifications();
     print("notifikaatiot on päällä: $notificationsEnabled" );
@@ -57,7 +55,7 @@ void main() async {
 }
 
 
-//timeri
+//timeri debuggailuun
 void printCurrentTime() {
   print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
 
@@ -72,11 +70,18 @@ void resetDailyTasks() async { // resetoi päivittäiset tehtävät
   await NotificationApi.cancelEveningNotifications();
   await SharedPreferencesHelper.setBool('morningMessageShown', false);
   await SharedPreferencesHelper.setBool('eveningMessageShown', false);
+
+  bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');// asetetaan uudet notifikaatiot peruutuksen jälkeen
+  if (notificationsEnabled) {
+    NotificationApi.scheduleMorningNotifications();
+    NotificationApi.scheduleEveningNotifications();
+    print("Uudet notifikaatiot asetettu resetin jälkeen: $notificationsEnabled");
+  }
 }
 
 @pragma('vm:entry-point')
-void scheduleDailyReset() async {
-  final int alarmId = 3; // Unique ID for the alarm
+void scheduleDailyReset() async { //daily resetin ajoitus
+  final int alarmId = 5; // uniikki id
 
   String dailyResetTime = await SharedPreferencesHelper.getString('dailyResetTime');
   List<String> timeParts = dailyResetTime.split(':');
@@ -91,9 +96,9 @@ void scheduleDailyReset() async {
     print("Scheduling daily reset at: $scheduleTime");
 
     await AndroidAlarmManager.periodic(
-        const Duration(days: 1), // Executes once a day
-        alarmId, // Unique ID
-        resetDailyTasks, // Function to call
+        const Duration(days: 1), // kerran päivässä
+        alarmId, // uniikki id
+        resetDailyTasks, // kursuu resettiä
         startAt: scheduleTime,
         exact: true,
         wakeup: true
@@ -103,8 +108,6 @@ void scheduleDailyReset() async {
   }
 }
 
-
-
 // notificationit
 
 Future<void> _showNotification() async {
@@ -113,13 +116,15 @@ Future<void> _showNotification() async {
   await flutterLocalNotificationsPlugin.show(3, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
 }
 
-
  void checkAndNotifyTasks() async {  // tarkistetaan että tehtävät on tehny, palauttaa 'true'
   bool areTasksDone = await DatabaseHelper.areAllTasksDone();
   if (!areTasksDone) {
     _showNotification();
   }
 }
+
+
+// appi
 
 class MyApp extends StatelessWidget { // myapp sovellus
   const MyApp({super.key}); // konstruktori

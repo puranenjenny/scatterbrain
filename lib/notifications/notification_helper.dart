@@ -111,7 +111,6 @@ class NotificationApi {
     }
   }
 
-
   //iltahälytykset
   static Future<void> scheduleEveningNotifications() async {
     String eveningTime = await SharedPreferencesHelper.getString('selectedEveningTime');
@@ -162,18 +161,18 @@ class NotificationApi {
     }
   }
 
-  static Future<void>cancelMorningNotifications()async{
-    for(int i=1000;i<2000;i++){
+  static Future<void>cancelMorningNotifications()async{ // cancellataan kaikki päällä olevat notificaatiot
+    for(int i=1000;i<2000;i++){ // käydään läpi kaikki aamuid:t
       await _notifications.cancel(i);
     }
-    print("Morningnotificationscancelled.");
+    print("Morningnotifications cancelled");
   }
 
   static Future<void>cancelEveningNotifications()async{
     for(int i=2000;i<3000;i++){
       await _notifications.cancel(i);
     }
-    print("Eveningnotificationscancelled.");
+    print("Eveningnotifications cancelled");
   }
 
 }

@@ -70,7 +70,7 @@ Widget _buildTaskList(List<Daily> tasks, String title) {
         final result = await showDialog( //varmistusikkuna
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Remove Daily task'),
+            title: Text('Delete Daily task'),
             content: Text('Do you want to delete this Daily task?'),
             actions: <Widget>[
               TextButton(
