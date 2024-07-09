@@ -24,22 +24,25 @@ class SharedPreferencesHelper {
 
   }
 
-  static Future<bool> setBool(String key, bool value) async {
-    print('Saving $key with value $value');
-    return _prefs?.setBool(key, value) ?? Future.value(false);
+  static bool getBool(String key, {bool defaultValue = false}) {
+    bool value = _prefs?.getBool(key) ?? defaultValue;
+    print("Getting $key: $value");
+    return value;
   }
 
-  static bool getBool(String key, {bool defaultValue = false}) {
-    return _prefs?.getBool(key) ?? defaultValue;
+  static Future<bool> setBool(String key, bool value) async {
+    print("Setting $key to $value");
+    return _prefs?.setBool(key, value) ?? Future.value(false);
   }
 
   static Future<bool> setString(String key, String value) async {
     print('Saving $key with value $value');
-      return _prefs?.setString(key, value) ?? Future.value(false);
-    }
+    return _prefs?.setString(key, value) ?? Future.value(false);
+  }
 
   static String getString(String key, {String defaultValue = ''}) {
-      return _prefs?.getString(key) ?? defaultValue;
-    }
-
+    String value = _prefs?.getString(key) ?? defaultValue;
+    print('Loading $key with value $value');
+    return value;
+  }
 }

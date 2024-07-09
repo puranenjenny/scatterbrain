@@ -96,7 +96,7 @@ void _loadTodos() async {
 
 String _selectedTimeOfDay = 'Morning'; // alustetaan dropdownin valinta
 
-  void _showAddDailyTaskDialog() {
+  void _showAddDailyTaskDialog() { // lisää daily dialogi
     showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -66,8 +66,6 @@ class NotificationApi {
     print('Scheduling morning notifications at $morningTime with frequency $frequency');
     print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
 
-
-
     if (!notificationsEnabled || morningMessageShown) return;
 
     final dailys = await DatabaseHelper.getDailyTasks(); //tarkistetaan onko aamutehtäviä
@@ -86,7 +84,6 @@ class NotificationApi {
     int minute = int.parse(timeParts[1]);
     int notificationFrequency = int.parse(frequency);
 
-    print( "Local time: $now");
     var morningDateTime = tz.TZDateTime(helsinki, now.year, now.month, now.day, hour, minute);
     print(morningDateTime);
 
@@ -99,7 +96,7 @@ class NotificationApi {
     for (int i = 0; i < maxNotifications; i++) {
       print("aamuhälytysloopin sisällä");
       _notifications.zonedSchedule(
-        1000 + i, // Ainutlaatuinen ID jokaiselle ilmoitukselle
+        1000 + i, // ainutlaatuinen ID jokaiselle ilmoitukselle
         "Hello there! 😊",
         "You have unfinished morning tasks! Do not sink in too deep before completing them!",
         morningDateTime.add(Duration(minutes: i * notificationFrequency)),
@@ -110,6 +107,7 @@ class NotificationApi {
       );
     }
   }
+
 
   //iltahälytykset
   static Future<void> scheduleEveningNotifications() async {
@@ -161,18 +159,18 @@ class NotificationApi {
     }
   }
 
-  static Future<void>cancelMorningNotifications()async{ // cancellataan kaikki päällä olevat notificaatiot
-    for(int i=1000;i<2000;i++){ // käydään läpi kaikki aamuid:t
+  static Future<void>cancelMorningNotifications()async{
+    for(int i=1000;i<2000;i++){
       await _notifications.cancel(i);
     }
-    print("Morningnotifications cancelled");
+    print("Morningnotificationscancelled.");
   }
 
   static Future<void>cancelEveningNotifications()async{
     for(int i=2000;i<3000;i++){
       await _notifications.cancel(i);
     }
-    print("Eveningnotifications cancelled");
+    print("Eveningnotificationscancelled.");
   }
 
 }

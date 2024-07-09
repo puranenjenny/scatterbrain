@@ -96,7 +96,7 @@ static Future<List<Daily>?> getDailyTasks() async { // hae kaikki daily tehtäv�
 
 // daily tehtävien nollaus ja tarkistus
 
-static Future<void> resetAllDailysToNotDone() async { // nollaa kaikki tehtävät joka päivä klo 5
+static Future<void> resetAllDailysToNotDone() async { // nollaa kaikki tehtävät joka päivä
   final Database db = await _getDB();
   await db.execute("UPDATE DailyTasks SET done = 0");
 }

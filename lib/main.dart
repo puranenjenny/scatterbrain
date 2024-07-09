@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart'; // flutterin materiaalikirjasto
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scatter_brain/notifications/notification_helper.dart';
@@ -17,10 +16,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // varmistetaan, että widgetit on alustettu
+  await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
   await AndroidAlarmManager.initialize(); // alustetaan android alarm manager
   NotificationApi.init(); // alustetaan ilmoitukset
-
-  Timer.periodic(Duration(minutes: 1), (Timer t) => printCurrentTime());  // timeri testaukseen
 
   var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
@@ -35,8 +33,6 @@ void main() async {
       Permission.notification.request(); // pyydetään notification oikeudet uudemmissa android malleissa
     }
   });
-
-  await SharedPreferencesHelper.initialize(); // alustetaan shared preferences
 
   tz.initializeTimeZones(); //alustetaan timezone
   var helsinki = tz.getLocation('Europe/Helsinki'); //ja asetetaan se helsinkiin
@@ -54,30 +50,36 @@ void main() async {
 
 }
 
-
 //timeri debuggailuun
 void printCurrentTime() {
   print("Current Helsinki time: ${tz.TZDateTime.now(tz.getLocation('Europe/Helsinki'))}");
-
 }
 
 // tehtävien resetointi
 
 @pragma('vm:entry-point') // hattu joka sallii funktion suoritettavaksi myös taustalla
-void resetDailyTasks() async { // resetoi päivittäiset tehtävät
+void resetDailyTasks() async {
   await DatabaseHelper.resetAllDailysToNotDone(); // kutsutaan DatabaseHelper:in funktiota jotta saadaan kaikki daily tehtävät done: false
   await NotificationApi.cancelMorningNotifications();
   await NotificationApi.cancelEveningNotifications();
   await SharedPreferencesHelper.setBool('morningMessageShown', false);
   await SharedPreferencesHelper.setBool('eveningMessageShown', false);
 
-  bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');// asetetaan uudet notifikaatiot peruutuksen jälkeen
+  // asetetaan uudet notifikaatiot resetin jälkeen
+  bool notificationsEnabled = await SharedPreferencesHelper.getBool('notificationsEnabled');
+  print("notificationsEnabled arvo: $notificationsEnabled");
   if (notificationsEnabled) {
-    NotificationApi.scheduleMorningNotifications();
-    NotificationApi.scheduleEveningNotifications();
-    print("Uudet notifikaatiot asetettu resetin jälkeen: $notificationsEnabled");
+    print("Asetetaan uudet aamun notifikaatiot...");
+    await NotificationApi.scheduleMorningNotifications();
+    print("Aamun notifikaatiot asetettu.");
+    print("Asetetaan uudet illan notifikaatiot...");
+    await NotificationApi.scheduleEveningNotifications();
+    print("Illan notifikaatiot asetettu.");
+  } else {
+    print("Notifikaatiot eivät ole päällä asetusten mukaan.");
   }
 }
+
 
 @pragma('vm:entry-point')
 void scheduleDailyReset() async { //daily resetin ajoitus
@@ -105,21 +107,6 @@ void scheduleDailyReset() async { //daily resetin ajoitus
     );
   } catch (e) {
     print('Error setting daily reset time: $e');
-  }
-}
-
-// notificationit
-
-Future<void> _showNotification() async {
-  var androidDetails = AndroidNotificationDetails('channelId', 'channelName');
-  var generalNotificationDetails = NotificationDetails(android: androidDetails);
-  await flutterLocalNotificationsPlugin.show(3, 'Hey there!', 'You have unfinished tasks!', generalNotificationDetails);
-}
-
- void checkAndNotifyTasks() async {  // tarkistetaan että tehtävät on tehny, palauttaa 'true'
-  bool areTasksDone = await DatabaseHelper.areAllTasksDone();
-  if (!areTasksDone) {
-    _showNotification();
   }
 }
 
@@ -159,7 +146,6 @@ class MyHomePageState extends State<MyHomePage> { // kotisivun tila luokka
       valittuIndexi = index; // asetetaan valittu sivu
     });
   }
-
 
   @override
   Widget build(BuildContext context) { // rakennetaan kotisivu
